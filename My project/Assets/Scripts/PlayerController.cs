@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -52,6 +53,11 @@ public class PlayerController : MonoBehaviour
     public CinemachineSwitcher camSwitcher;        // 옵션: 할당 시 정확 판정
     public bool lockMoveInFreeLook = true;         // 끄면 기존과 동일
 
+    public int maxHP = 10;
+    private int currentHP;
+
+    public Slider hpSlider;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -68,6 +74,9 @@ public class PlayerController : MonoBehaviour
 
         // 시작/리스폰 기준 저장
         startPos = respawnPoint ? respawnPoint.position : transform.position;
+
+        currentHP = maxHP;
+        hpSlider.value = 1f;
     }
 
     void Update()
@@ -79,8 +88,16 @@ public class PlayerController : MonoBehaviour
             jumpCount = 0;           // [추가] 땅이면 점프 횟수 리셋
         }
 
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            pov.m_HorizontalAxis.Value =  transform.eulerAngles.y;
+            pov.m_VerticalAxis.Value = 0f;
+        }
+            
+
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
+
 
         // --- FreeLook 활성 여부 ---
         bool isFreeLook =
@@ -197,6 +214,23 @@ public class PlayerController : MonoBehaviour
         respawnPoint = t;
         startPos = t.position;
         jumpCount = 0;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHP -= damage;
+        hpSlider.value = (float)currentHP / maxHP;
+
+        if (currentHP < 0)
+        {
+
+            Die();
+        }
+    }
+
+    void Die()
+    {
+      Destroy(gameObject);
     }
 }
 

@@ -12,7 +12,7 @@ public class EnemySpawner : MonoBehaviour
     public float spawnRange = 5f; // 생성 반경
 
     private float timer = 0f;
- 
+
     void Update()
     {
         timer += Time.deltaTime;
@@ -37,3 +37,4 @@ public class EnemySpawner : MonoBehaviour
         Gizmos.DrawWireCube(transform.position, new Vector3(spawnRange * 2, 1, spawnRange * 2));
     }
 }
+
