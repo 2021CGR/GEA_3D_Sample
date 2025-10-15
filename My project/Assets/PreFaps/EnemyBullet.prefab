@@ -10,18 +10,33 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 1f907f70773f48e41b04c394d8ebeef0,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 4.012076
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1f907f70773f48e41b04c394d8ebeef0,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 4.012076
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1f907f70773f48e41b04c394d8ebeef0,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 4.012076
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 1f907f70773f48e41b04c394d8ebeef0,
+        type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0
+      value: 0.1506
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1f907f70773f48e41b04c394d8ebeef0,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.45181
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1f907f70773f48e41b04c394d8ebeef0,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.1506
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1f907f70773f48e41b04c394d8ebeef0,
         type: 3}
@@ -95,8 +110,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 2
-  sppeed: 8
-  lifeTime: 1.5
+  sppeed: 20
+  lifeTime: 5
 --- !u!65 &3529613075554673417
 BoxCollider:
   m_ObjectHideFlags: 0

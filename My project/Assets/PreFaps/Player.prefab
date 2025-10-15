@@ -56,7 +56,7 @@ Transform:
   m_GameObject: {fileID: 9216684781132488743}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1.23, z: 0.046}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -88,7 +88,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 13d70356f25b3324780422a722fb335f,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.26454
+      value: 2.87
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 13d70356f25b3324780422a722fb335f,
         type: 3}
@@ -98,7 +98,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 13d70356f25b3324780422a722fb335f,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.5872
+      value: -113.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 13d70356f25b3324780422a722fb335f,
         type: 3}
@@ -140,6 +140,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 13d70356f25b3324780422a722fb335f,
+        type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -155,11 +160,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 13d70356f25b3324780422a722fb335f,
         type: 3}
       insertIndex: -1
+      addedObject: {fileID: 5431754355922133001}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 13d70356f25b3324780422a722fb335f,
+        type: 3}
+      insertIndex: -1
       addedObject: {fileID: 363687616564066059}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 13d70356f25b3324780422a722fb335f,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6662039587653378287}
+      addedObject: {fileID: 1180540377456996430}
   m_SourcePrefab: {fileID: 100100000, guid: 13d70356f25b3324780422a722fb335f, type: 3}
 --- !u!4 &198831819805974938 stripped
 Transform:
@@ -173,6 +182,32 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 380797168822847089}
   m_PrefabAsset: {fileID: 0}
+--- !u!143 &5431754355922133001
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 687279223850941216}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &363687616564066059
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,27 +221,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  sprintMultiplier: 1.7
+  sprintMultiplier: 5
   sprintKey: 304
   allowRightShift: 1
-  jumpPower: 5
+  jumpPower: 7
   gravity: -9.81
   virtualCam: {fileID: 0}
   rotationSpeed: 10
-  isGrounded: 0
-  maxJumps: 2
+  isGrounded: 1
+  maxJumps: 5
   sprintCamEffect: 1
   sprintFOV: 70
   camLerpSpeed: 8
   sprintDistanceAdd: 0.8
   respawnPoint: {fileID: 0}
   respawnFloorTag: RespawnFloor
-  respawnYOffset: 0.5
+  respawnYOffset: 1
   camSwitcher: {fileID: 0}
   lockMoveInFreeLook: 1
   maxHP: 10
   hpSlider: {fileID: 0}
---- !u!114 &6662039587653378287
+--- !u!114 &1180540377456996430
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -218,6 +253,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fab918f048927ca47ac75eca411e8c16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  firePoint: {fileID: 0}
+  firePoint: {fileID: 8010007365315455568}
   switchKey: 122
-  projectileVariants: []
+  projectileVariants:
+  - {fileID: 2338292460281037090, guid: 52c2ddcaf0810fd4d99826035bd75042, type: 3}
+  - {fileID: 2338292460281037090, guid: 52c2ddcaf0810fd4d99826035bd75042, type: 3}
