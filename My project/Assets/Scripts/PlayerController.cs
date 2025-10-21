@@ -23,21 +23,29 @@ public class PlayerController : MonoBehaviour
     public int maxJumps = 2; // 최대 점프 횟수입니다. (2로 설정하면 더블 점프가 가능합니다.)
     private int jumpCount = 0; // 현재까지 몇 번 점프했는지 저장하는 변수입니다.
 
-    // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ [추가된 변수] 더 나은 점프를 위한 변수 ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
     [Header("더 나은 점프 (Better Jumping)")]
     [Tooltip("떨어질 때 적용할 중력 배율입니다. 높을수록 빨리 떨어집니다.")]
     public float fallMultiplier = 2.5f;
     [Tooltip("점프 키를 짧게 눌렀을 때의 중력 배율입니다. 낮은 점프를 만듭니다.")]
     public float lowJumpMultiplier = 2f;
-    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
     [Header("체력 설정")]
     public int maxHP = 10; // 최대 체력입니다.
     public Slider hpSlider; // 체력을 표시할 UI 슬라이더입니다.
     private int currentHP; // 현재 체력을 저장하는 변수입니다.
 
+    [Header("지속 데미지 설정 (용암 바닥 등)")]
+    [Tooltip("활성화하면 땅에 닿아있을 때 주기적으로 데미지를 입습니다.")]
+    public bool enableGroundDamage = false; // 이 기능을 켤지 끌지 결정하는 스위치입니다.
+    [Tooltip("몇 초마다 데미지를 입을지 설정합니다.")]
+    public float groundDamageInterval = 1f; // 요청하신대로 1초마다 1씩 닳게 1f로 설정 (조절 가능)
+    [Tooltip("지속 데미지로 입을 데미지 양입니다.")]
+    public int groundDamageAmount = 1; // 요청하신대로 1씩 닳게 1로 설정 (조절 가능)
+
+    private float groundContactTimer = 0f; // 땅에 닿은 시간을 추적하는 내부 타이머 변수입니다.
+
     // --- 이하 private 변수들 (스크립트 내부에서만 사용) ---
-    private CharacterController controller; // 물리적인 이동과 충돌을 처리하는 컴포넌트입니다.
+    private CharacterController controller; // 물리적인 이동과 충돌을 처리하는 컴포E트입니다.
     private CinemachinePOV pov; // 1인칭/3인칭 시점 조작을 위한 시네머신 컴포넌트입니다.
     private Vector3 velocity; // 플레이어의 y축 속도(중력, 점프)를 저장하는 변수입니다.
     public bool isGrounded; // 플레이어가 땅에 닿아있는지 여부를 나타냅니다.
@@ -63,7 +71,11 @@ public class PlayerController : MonoBehaviour
 
         // 체력을 최대로 설정하고 UI에 반영합니다.
         currentHP = maxHP;
-        hpSlider.value = 1f;
+        if (hpSlider != null) // hpSlider가 할당되었는지 확인
+        {
+            hpSlider.maxValue = maxHP; // (예: 15)
+            hpSlider.value = currentHP;    // (예: 15) -> 이 방식(0~maxHP)으로 통일
+        }
     }
 
     // Update() 함수는 매 프레임마다 호출됩니다. (게임의 핵심 로직 담당)
@@ -77,6 +89,30 @@ public class PlayerController : MonoBehaviour
         {
             velocity.y = -2f; // 캐릭터가 땅에 살짝 붙어있도록 y 속도를 낮게 설정합니다. (경사로에서 미끄러짐 방지)
             jumpCount = 0; // 땅에 닿았으므로 점프 횟수를 초기화합니다.
+        }
+
+        // [추가된 로직] 지속 데미지 처리
+        // '지속 데미지' 기능이 활성화되어 있다면
+        if (enableGroundDamage)
+        {
+            // 현재 땅에 닿아있다면
+            if (isGrounded)
+            {
+                // 땅에 닿아있는 시간을 계속 더합니다.
+                groundContactTimer += Time.deltaTime;
+
+                // 누적된 시간이 설정한 데미지 간격(groundDamageInterval)을 넘어서면
+                if (groundContactTimer >= groundDamageInterval)
+                {
+                    TakeDamage(groundDamageAmount); // 설정된 데미지만큼 피해를 줍니다.
+                    groundContactTimer = 0f; // 타이머를 0으로 리셋하여 다음 데미지까지 다시 셉니다.
+                }
+            }
+            else
+            {
+                // 땅에서 떨어졌다면 (점프 또는 추락 중) 타이머를 0으로 리셋합니다.
+                groundContactTimer = 0f;
+            }
         }
 
         // Tab 키를 누르면 카메라 시점을 플레이어가 보는 방향으로 초기화합니다.
@@ -138,21 +174,17 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ [수정된 부분] 더 나은 점프(Better Jumping) 로직 ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+        // [수정된 부분] 더 나은 점프(Better Jumping) 로직
         // 1. 캐릭터가 아래로 떨어지고 있을 때 (y 속도가 음수일 때)
         if (velocity.y < 0)
         {
-            // 기본 중력에 fallMultiplier를 추가로 곱해줘서 더 강한 중력을 적용합니다.
-            // (fallMultiplier - 1)을 곱하는 이유는, 아래의 기본 중력이 한 번 더해지기 때문입니다.
             velocity.y += gravity * (fallMultiplier - 1) * Time.deltaTime;
         }
         // 2. 캐릭터가 위로 올라가고 있는데, 점프 키에서 손을 뗐을 때
         else if (velocity.y > 0 && !Input.GetKey(KeyCode.Space))
         {
-            // lowJumpMultiplier를 추가로 곱해줘서 상승을 빠르게 멈추고 하강을 시작하게 합니다. (짧은 점프 구현)
             velocity.y += gravity * (lowJumpMultiplier - 1) * Time.deltaTime;
         }
-        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
         // 기본 중력은 매 프레임 항상 적용됩니다.
         velocity.y += gravity * Time.deltaTime;
@@ -181,11 +213,24 @@ public class PlayerController : MonoBehaviour
     // 데미지를 받는 함수입니다. (외부 스크립트, 예: 총알, 적의 공격에서 호출됩니다.)
     public void TakeDamage(int damage)
     {
-        currentHP -= damage; // 현재 체력에서 데미지만큼 뺍니다.
-        hpSlider.value = (float)currentHP / maxHP; // HP 슬라이더 UI에 현재 체력 비율을 반영합니다.
+        // 이미 죽었다면 데미지를 받지 않도록 처리
+        if (currentHP <= 0) return;
+
+        currentHP -= damage; // 현재 체력에서 데미지만큼 nbsp;니다.
+
+        // 체력이 0보다 작아지지 않도록 보정
+        if (currentHP < 0) currentHP = 0;
+
+        if (hpSlider != null) // hpSlider가 할당되었는지 확인
+        {
+            // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ [수정된 부분] ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+            // (float)currentHP / maxHP; -> 비율(0~1)이 아닌 실제 체력 값(0~maxHP)을 넣어줍니다.
+            hpSlider.value = currentHP;
+            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+        }
 
         // 만약 체력이 0 이하가 되었다면
-        if (currentHP <= 0) // < 0 보다 <= 0 이 더 안전합니다.
+        if (currentHP <= 0)
         {
             Die(); // 죽음 처리 함수를 호출합니다.
         }
@@ -194,8 +239,24 @@ public class PlayerController : MonoBehaviour
     // 죽었을 때 처리할 내용을 담은 함수입니다.
     void Die()
     {
-        // 이 게임 오브젝트를 씬에서 제거합니다.
-        Destroy(gameObject);
+        // [수정된 부분] Die() 함수 로직 변경
+        // 플레이어가 죽으면 파괴되는 대신, 리스폰 위치로 이동하고 체력을 회복합니다.
+
+        Debug.Log("플레이어가 사망하여 리스폰합니다.");
+
+        // 스크립트에 이미 구현되어 있는 리스폰 함수를 호출합니다.
+        ResetToSpawn();
+
+        // 체력을 최대로 다시 채웁니다.
+        currentHP = maxHP;
+
+        if (hpSlider != null) // hpSlider가 할당되었는지 확인
+        {
+            // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ [수정된 부분] ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+            // (float)currentHP / maxHP; -> 비율(0~1)이 아닌 실제 체력 값(0~maxHP)을 넣어줍니다.
+            hpSlider.value = currentHP; // UI도 최대치로 다시 채웁니다.
+            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+        }
     }
 
     // (이하 카메라 및 리스폰 관련 헬퍼 함수들은 생략합니다)

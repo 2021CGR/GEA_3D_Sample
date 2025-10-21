@@ -4738,7 +4738,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1229988427}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.42831388, y: -0.5712413, z: 0.47995535, w: 0.50977784}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.00001335144, y: 0, z: -0.0000030696392}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -7317,7 +7317,7 @@ Transform:
   m_GameObject: {fileID: 1974838996}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 674, y: -23, z: -363}
+  m_LocalPosition: {x: -15, y: -23, z: 144}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7335,10 +7335,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a56f98f83aa740a42a2e21a5a850c637, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyPrefab: {fileID: 7397860755082290215, guid: f64df71c1cdd6d64f978550fb24c05be,
-    type: 3}
+  enemyPrefabs:
+  - {fileID: 7397860755082290215, guid: f64df71c1cdd6d64f978550fb24c05be, type: 3}
   spawnInterval: 3
-  spawnRange: 650
+  spawnRange: 326.1
 --- !u!4 &1976236065 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5951049203447126627, guid: 73851efd423560147aa25f37ab6a96b1,
