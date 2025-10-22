@@ -19,8 +19,8 @@ public class PlayerController : MonoBehaviour
     public KeyCode sprintKey = KeyCode.LeftShift; // 달리기에 사용할 키입니다.
     public bool allowRightShift = true; // 오른쪽 Shift 키로도 달리기를 허용할지 여부입니다.
 
-    [Header("더블 점프 설정")]
-    public int maxJumps = 2; // 최대 점프 횟수입니다. (2로 설정하면 더블 점프가 가능합니다.)
+    [Header("점프 설정 (싱글 점프)")] // [수정] 헤더 이름을 '더블 점프 설정'에서 '점프 설정'으로 변경했습니다.
+    public int maxJumps = 1; // [수정] 최대 점프 횟수를 1로 설정하여 싱글 점프만 가능하게 했습니다.
     private int jumpCount = 0; // 현재까지 몇 번 점프했는지 저장하는 변수입니다.
 
     [Header("더 나은 점프 (Better Jumping)")]
@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
     private float groundContactTimer = 0f; // 땅에 닿은 시간을 추적하는 내부 타이머 변수입니다.
 
     // --- 이하 private 변수들 (스크립트 내부에서만 사용) ---
-    private CharacterController controller; // 물리적인 이동과 충돌을 처리하는 컴포E트입니다.
+    private CharacterController controller; // 물리적인 이동과 충돌을 처리하는 컴포넌트입니다.
     private CinemachinePOV pov; // 1인칭/3인칭 시점 조작을 위한 시네머신 컴포넌트입니다.
     private Vector3 velocity; // 플레이어의 y축 속도(중력, 점프)를 저장하는 변수입니다.
     public bool isGrounded; // 플레이어가 땅에 닿아있는지 여부를 나타냅니다.
@@ -166,7 +166,7 @@ public class PlayerController : MonoBehaviour
         // 스페이스 바를 "누르는 순간"을 감지하고, FreeLook 상태가 아닐 때
         if (!isFreeLook && Input.GetKeyDown(KeyCode.Space))
         {
-            // 현재 점프 횟수가 최대 점프 횟수보다 적다면
+            // [수정된 부분] 싱글 점프 로직: 현재 점프 횟수가 최대 점프 횟수(1)보다 적다면
             if (jumpCount < maxJumps)
             {
                 velocity.y = jumpPower; // y축 속도에 점프 힘을 부여합니다.
@@ -174,20 +174,26 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // [수정된 부분] 더 나은 점프(Better Jumping) 로직
-        // 1. 캐릭터가 아래로 떨어지고 있을 때 (y 속도가 음수일 때)
+        // [수정된 부분] 더 나은 점프(Better Jumping) 로직 - 중력 가속 적용 방식 변경
+        // 1. 캐릭터가 아래로 떨어지고 있을 때 (velocity.y < 0)
         if (velocity.y < 0)
         {
-            velocity.y += gravity * (fallMultiplier - 1) * Time.deltaTime;
+            // 기본 중력 대신, fallMultiplier를 적용한 더 강한 중력을 적용하여 빨리 떨어지게 합니다.
+            velocity.y += gravity * fallMultiplier * Time.deltaTime; // [변경] (fallMultiplier - 1) 제거
         }
-        // 2. 캐릭터가 위로 올라가고 있는데, 점프 키에서 손을 뗐을 때
+        // 2. 캐릭터가 위로 올라가고 있는데, 점프 키에서 손을 뗌 (짧은 점프)
         else if (velocity.y > 0 && !Input.GetKey(KeyCode.Space))
         {
-            velocity.y += gravity * (lowJumpMultiplier - 1) * Time.deltaTime;
+            // 기본 중력 대신, lowJumpMultiplier를 적용한 더 강한 중력을 적용하여 낮은 점프를 유도합니다.
+            velocity.y += gravity * lowJumpMultiplier * Time.deltaTime; // [변경] (lowJumpMultiplier - 1) 제거
+        }
+        // 3. 캐릭터가 위로 올라가는 중이고, 점프 키를 누르고 있음 (기본 점프)
+        else
+        {
+            // 기본 중력만 적용합니다.
+            velocity.y += gravity * Time.deltaTime;
         }
 
-        // 기본 중력은 매 프레임 항상 적용됩니다.
-        velocity.y += gravity * Time.deltaTime;
         // 최종적으로 계산된 y축 속도(velocity)를 캐릭터 이동에 반영합니다.
         controller.Move(velocity * Time.deltaTime);
 
@@ -216,17 +222,15 @@ public class PlayerController : MonoBehaviour
         // 이미 죽었다면 데미지를 받지 않도록 처리
         if (currentHP <= 0) return;
 
-        currentHP -= damage; // 현재 체력에서 데미지만큼 nbsp;니다.
+        currentHP -= damage; // 현재 체력에서 데미지만큼 감소합니다.
 
         // 체력이 0보다 작아지지 않도록 보정
         if (currentHP < 0) currentHP = 0;
 
         if (hpSlider != null) // hpSlider가 할당되었는지 확인
         {
-            // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ [수정된 부분] ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
-            // (float)currentHP / maxHP; -> 비율(0~1)이 아닌 실제 체력 값(0~maxHP)을 넣어줍니다.
+            // 비율(0~1)이 아닌 실제 체력 값(0~maxHP)을 넣어줍니다.
             hpSlider.value = currentHP;
-            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
         }
 
         // 만약 체력이 0 이하가 되었다면
@@ -239,7 +243,6 @@ public class PlayerController : MonoBehaviour
     // 죽었을 때 처리할 내용을 담은 함수입니다.
     void Die()
     {
-        // [수정된 부분] Die() 함수 로직 변경
         // 플레이어가 죽으면 파괴되는 대신, 리스폰 위치로 이동하고 체력을 회복합니다.
 
         Debug.Log("플레이어가 사망하여 리스폰합니다.");
@@ -252,10 +255,8 @@ public class PlayerController : MonoBehaviour
 
         if (hpSlider != null) // hpSlider가 할당되었는지 확인
         {
-            // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ [수정된 부분] ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
-            // (float)currentHP / maxHP; -> 비율(0~1)이 아닌 실제 체력 값(0~maxHP)을 넣어줍니다.
-            hpSlider.value = currentHP; // UI도 최대치로 다시 채웁니다.
-            // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+            // UI도 최대치로 다시 채웁니다.
+            hpSlider.value = currentHP;
         }
     }
 
