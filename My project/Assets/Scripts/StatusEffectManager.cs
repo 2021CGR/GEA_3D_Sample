@@ -1,13 +1,16 @@
 using System.Collections;
 using UnityEngine;
 
-// 디버프 유형을 정의하는 열거형(Enum)입니다.
-// 여기에 '화상', '중독' 등 다양한 디버프를 추가할 수 있습니다.
+/// <summary>
+/// 디버프 유형을 정의하는 열거형(Enum)입니다.
+/// 여기에 원하는 모든 디버프를 추가하여 관리할 수 있습니다.
+/// </summary>
 public enum DebuffType
 {
-    Slow,    // 느려짐 디버프
-    // Freeze,  // 얼어붙음 등
-    // Poison,  // 중독 등
+    None,    // 디버프 없음
+    Slow,    // 느려짐 (달리기 불가 포함)
+    Poison,  // 중독 (지속 피해)
+    Stun     // 스턴 (행동 불가)
 }
 
 // 이 컴포넌트는 플레이어에게 부착되어 디버프 상태를 관리합니다.
@@ -18,78 +21,161 @@ public class StatusEffectManager : MonoBehaviour
     [Tooltip("플레이어의 이동 속도를 제어하는 PlayerController 스크립트입니다.")]
     public PlayerController playerController;
 
-    // === 디버프 관련 내부 변수 ===
-    // 현재 느려짐 디버프가 적용 중인지 나타냅니다.
+    // === 디버프 상태 변수 ===
+    // (이 변수들은 디버프가 중첩되거나, 해제될 때 상태를 관리하기 위해 필요합니다.)
     private bool isSlowed = false;
-    // 느려짐 디버프의 원래 이동 속도 배율입니다.
-    private float originalSpeedMultiplier = 1f;
+    private bool isPoisoned = false; // [추가]
+    private bool isStunned = false;  // [추가]
 
-    // Start는 게임 시작 시 한 번 호출됩니다.
+    // (원본 스탯 저장을 위한 변수)
+    private float originalSpeedMultiplier = 1f;
+    private float originalSpeed = 5f;
+
+
     void Start()
     {
-        // PlayerController가 할당되지 않았다면, 같은 게임 오브젝트에서 찾습니다.
         if (playerController == null)
         {
             playerController = GetComponent<PlayerController>();
         }
 
-        // PlayerController가 필수적이므로, 없으면 경고를 띄웁니다.
         if (playerController == null)
         {
             Debug.LogError("StatusEffectManager: PlayerController를 찾을 수 없습니다! 디버프를 적용할 수 없습니다.");
         }
+        else
+        {
+            // 스크립트 시작 시, 플레이어의 초기 속도/배율 값을 기본으로 저장해둡니다.
+            originalSpeed = playerController.speed;
+            originalSpeedMultiplier = playerController.sprintMultiplier;
+        }
     }
 
     /// <summary>
-    /// 지정된 디버프를 특정 시간 동안 플레이어에게 적용하는 공용 함수입니다.
+    /// [핵심] 모든 적들이 이 함수를 호출하여 디버프를 요청합니다.
     /// </summary>
-    /// <param name="type">적용할 디버프의 종류입니다 (예: DebuffType.Slow)</param>
-    /// <param name="duration">디버프가 지속될 시간 (초)</param>
-    /// <param name="magnitude">디버프의 강도 (느려짐의 경우, 속도에 곱할 배율)</param>
+    /// <param name="type">적용할 디버프의 종류 (Enum)</param>
+    /// <param name="duration">지속 시간 (초)</param>
+    /// <param name="magnitude">강도 (느려짐 배율, 초당 중독 데미지 등)</param>
     public void ApplyDebuff(DebuffType type, float duration, float magnitude)
     {
-        // 현재 실행 중인 동일한 디버프 코루틴이 있다면 중지하여 중첩을 방지합니다.
-        // (디버프 중첩 로직이 복잡하다면 여기에 추가적인 관리가 필요합니다.)
+        // 플레이어가 없거나, 스턴 상태에서는 다른 디버프가 걸리지 않도록 방지
+        // (단, 스턴 갱신은 허용)
+        if (playerController == null || (isStunned && type != DebuffType.Stun))
+        {
+            return;
+        }
+
+        // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ [수정된 부분] ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+        // 이전에 실행 중이던 *같은 종류의* 디버프 코루틴을 중지합니다.
+        // (이름을 Enum과 맞추는 것이 중요합니다: "Slow" -> "SlowDebuffRoutine")
         StopCoroutine(type.ToString() + "DebuffRoutine");
 
-        // 새로운 디버프 코루틴을 시작합니다.
-        StartCoroutine(type.ToString() + "DebuffRoutine", new object[] { duration, magnitude });
+        // 요청받은 디버프 타입(type)에 따라 적절한 코루틴을 실행합니다.
+        switch (type)
+        {
+            case DebuffType.Slow:
+                StartCoroutine(SlowDebuffRoutine(duration, magnitude));
+                break;
+
+            case DebuffType.Poison:
+                // magnitude를 '초당 데미지'로 해석하여 전달합니다.
+                StartCoroutine(PoisonDebuffRoutine(duration, magnitude));
+                break;
+
+            case DebuffType.Stun:
+                // magnitude는 스턴에서 사용하지 않지만, 일관성을 위해 전달합니다.
+                StartCoroutine(StunDebuffRoutine(duration, magnitude));
+                break;
+
+            case DebuffType.None:
+            default:
+                // 아무것도 하지 않음
+                break;
+        }
+        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
     }
 
-    /// <summary>
-    /// [코루틴] 느려짐 디버프의 적용 및 해제를 시간 관리하는 함수입니다.
-    /// </summary>
+    // --- 1. 느려짐(Slow) 코루틴 (이전 코드와 동일) ---
     private IEnumerator SlowDebuffRoutine(float duration, float magnitude)
     {
-        // 이미 느려짐 상태가 아니라면, 처음 디버프를 적용합니다.
         if (!isSlowed)
         {
             isSlowed = true;
-            originalSpeedMultiplier = playerController.sprintMultiplier; // 현재 달리기 속도 배율을 저장합니다.
+            // (1) 기본 속도 저장 및 감소
+            originalSpeed = playerController.speed;
+            playerController.speed *= magnitude;
+            // (2) 달리기 배율 저장 및 비활성화
+            originalSpeedMultiplier = playerController.sprintMultiplier;
+            playerController.sprintMultiplier = 1f;
 
-            // PlayerController의 달리기 속도 배율을 디버프 강도에 맞게 조정합니다.
-            // 예: magnitude가 0.5f이면 원래 속도의 절반으로 느려집니다.
-            playerController.sprintMultiplier *= magnitude;
-
-            Debug.Log($"[디버프] 느려짐이 적용되었습니다. 속도 배율: {playerController.sprintMultiplier}");
+            Debug.Log($"[디버프] 느려짐 적용! (기본 속도: {playerController.speed}, 달리기 비활성화)");
         }
         else
         {
-            // 이미 느려짐 상태라면, 시간만 초기화합니다.
-            // (여기서는 단순하게 코루틴을 재시작하여 지속 시간을 갱신합니다.)
+            Debug.Log("[디버프] 느려짐 갱신.");
         }
 
-        // 디버프 지속 시간만큼 대기합니다.
         yield return new WaitForSeconds(duration);
 
-        // --- 디버프 해제 로직 ---
         if (isSlowed)
         {
-            // 속도 배율을 저장했던 원래 값으로 되돌립니다.
+            // (1) 속도 복구
+            playerController.speed = originalSpeed;
+            // (2) 달리기 배율 복구
             playerController.sprintMultiplier = originalSpeedMultiplier;
             isSlowed = false;
-
             Debug.Log("[디버프] 느려짐이 해제되었습니다. 원래 속도로 복귀.");
         }
+    }
+
+    // --- 2. 중독(Poison) 코루틴 [추가] ---
+    /// <param name="duration">총 지속 시간</param>
+    /// <param name="damagePerTick">1초마다 입힐 데미지 (magnitude가 이 값으로 전달됨)</param>
+    private IEnumerator PoisonDebuffRoutine(float duration, float damagePerTick)
+    {
+        isPoisoned = true;
+        float tickInterval = 1.0f; // 1초마다 데미지를 줍니다.
+        float durationTimer = 0f;
+        int damageAmount = Mathf.RoundToInt(damagePerTick); // TakeDamage는 int를 받으므로 변환
+
+        Debug.Log($"[디버프] 중독 적용! (지속시간: {duration}, 초당 데미지: {damageAmount})");
+
+        // 지속 시간(duration)이 다 될 때까지 반복
+        while (durationTimer < duration)
+        {
+            // 1초 대기
+            yield return new WaitForSeconds(tickInterval);
+
+            if (playerController != null)
+            {
+                playerController.TakeDamage(damageAmount);
+                Debug.Log($"[디버프] 중독 데미지 {damageAmount} 적용!");
+            }
+
+            durationTimer += tickInterval;
+        }
+
+        isPoisoned = false;
+        Debug.Log("[디버프] 중독 해제.");
+    }
+
+    // --- 3. 스턴(Stun) 코루틴 [추가] ---
+    /// <param name="duration">스턴 지속 시간</param>
+    /// <param name="magnitude_unused">스턴은 강도가 필요 없지만, 파라미터는 받습니다.</param>
+    private IEnumerator StunDebuffRoutine(float duration, float magnitude_unused)
+    {
+        // 스턴은 다른 디버프와 달리, 플레이어 컨트롤러의 기능을 직접 제어해야 합니다.
+        if (playerController == null) yield break;
+
+        isStunned = true;
+        playerController.canMove = false; // PlayerController에 추가할 변수
+        Debug.Log($"[디버프] 스턴 적용! (지속시간: {duration})");
+
+        yield return new WaitForSeconds(duration);
+
+        playerController.canMove = true;
+        isStunned = false;
+        Debug.Log("[디버프] 스턴 해제.");
     }
 }

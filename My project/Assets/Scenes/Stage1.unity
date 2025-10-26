@@ -1218,7 +1218,7 @@ PrefabInstance:
     - target: {fileID: 363687616564066059, guid: 67f464c7bd8ee084a8f4f5382334d098,
         type: 3}
       propertyPath: maxJumps
-      value: 7
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 363687616564066059, guid: 67f464c7bd8ee084a8f4f5382334d098,
         type: 3}
@@ -1257,9 +1257,38 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1180540377456996430, guid: 67f464c7bd8ee084a8f4f5382334d098,
         type: 3}
+      propertyPath: allWeaponPrefabs.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1180540377456996430, guid: 67f464c7bd8ee084a8f4f5382334d098,
+        type: 3}
       propertyPath: projectileVariants.Array.size
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1180540377456996430, guid: 67f464c7bd8ee084a8f4f5382334d098,
+        type: 3}
+      propertyPath: allWeaponPrefabs.Array.data[0]
+      value: 
+      objectReference: {fileID: 2338292460281037090, guid: 52c2ddcaf0810fd4d99826035bd75042,
+        type: 3}
+    - target: {fileID: 1180540377456996430, guid: 67f464c7bd8ee084a8f4f5382334d098,
+        type: 3}
+      propertyPath: allWeaponPrefabs.Array.data[1]
+      value: 
+      objectReference: {fileID: 2771730616043176181, guid: d2e87b212c666e54b92f42d7db332eda,
+        type: 3}
+    - target: {fileID: 1180540377456996430, guid: 67f464c7bd8ee084a8f4f5382334d098,
+        type: 3}
+      propertyPath: allWeaponPrefabs.Array.data[2]
+      value: 
+      objectReference: {fileID: 5298231913516924491, guid: dcf61398706cc864c8e7017237dad517,
+        type: 3}
+    - target: {fileID: 1180540377456996430, guid: 67f464c7bd8ee084a8f4f5382334d098,
+        type: 3}
+      propertyPath: allWeaponPrefabs.Array.data[4]
+      value: 
+      objectReference: {fileID: 9129109264366754805, guid: b26d96025415def4f97a85f13949f693,
+        type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3286,6 +3315,85 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 73851efd423560147aa25f37ab6a96b1, type: 3}
+--- !u!1 &774698854
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 774698855}
+  - component: {fileID: 774698857}
+  - component: {fileID: 774698856}
+  m_Layer: 5
+  m_Name: Kill
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &774698855
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774698854}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1240845664}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 680}
+  m_SizeDelta: {x: 160, y: 30}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &774698856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774698854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 25
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 1
+    m_MaxSize: 50
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 'Kills: 0 / 5'
+--- !u!222 &774698857
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774698854}
+  m_CullTransparentMesh: 1
 --- !u!1 &787546020 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8164078558771037576, guid: ddc711ba2830ebe418e7d96343807747,
@@ -4738,7 +4846,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1229988427}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.42831388, y: -0.5712413, z: 0.47995535, w: 0.50977784}
   m_LocalPosition: {x: -0.00001335144, y: 0, z: -0.0000030696392}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4856,6 +4964,7 @@ RectTransform:
   m_Children:
   - {fileID: 666221685}
   - {fileID: 794818316}
+  - {fileID: 774698855}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4921,7 +5030,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -6606,7 +6715,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1719960201}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.33776847, y: -0.64297503, z: 0.37849295, w: 0.5737933}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -7390,8 +7499,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   killsToClear: 5
-  nextSceneName: Map2
-  killCountText: {fileID: 0}
+  nextSceneName: Stage2
+  mainMenuSceneName: 
+  stage1SceneName: 
+  killCountText: {fileID: 774698856}
+  clearPanel: {fileID: 0}
 --- !u!1 &1992471500 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8164078558771037576, guid: ddc711ba2830ebe418e7d96343807747,

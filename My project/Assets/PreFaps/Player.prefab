@@ -88,17 +88,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 13d70356f25b3324780422a722fb335f,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.87
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 13d70356f25b3324780422a722fb335f,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.31
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 13d70356f25b3324780422a722fb335f,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -113.5
+      value: -334
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 13d70356f25b3324780422a722fb335f,
         type: 3}
@@ -169,6 +169,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1180540377456996430}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 13d70356f25b3324780422a722fb335f,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1809690294592020227}
   m_SourcePrefab: {fileID: 100100000, guid: 13d70356f25b3324780422a722fb335f, type: 3}
 --- !u!4 &198831819805974938 stripped
 Transform:
@@ -220,18 +224,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49547f6e9e062b04a846e476e43bf67f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
-  sprintMultiplier: 5
+  speed: 20
+  jumpPower: 20
+  gravity: -15
+  rotationSpeed: 10
+  virtualCam: {fileID: 0}
+  sprintMultiplier: 4.5
   sprintKey: 304
   allowRightShift: 1
-  jumpPower: 7
-  gravity: -9.81
-  virtualCam: {fileID: 0}
-  rotationSpeed: 10
+  maxJumps: 2
+  fallMultiplier: 5
+  lowJumpMultiplier: 2
+  maxHP: 20
+  hpSlider: {fileID: 0}
   isGrounded: 1
-  maxJumps: 5
+  canMove: 1
   sprintCamEffect: 1
-  sprintFOV: 70
+  sprintFOV: 120
   camLerpSpeed: 8
   sprintDistanceAdd: 0.8
   respawnPoint: {fileID: 0}
@@ -239,8 +248,6 @@ MonoBehaviour:
   respawnYOffset: 1
   camSwitcher: {fileID: 0}
   lockMoveInFreeLook: 1
-  maxHP: 10
-  hpSlider: {fileID: 0}
 --- !u!114 &1180540377456996430
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -255,6 +262,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   firePoint: {fileID: 8010007365315455568}
   switchKey: 122
-  projectileVariants:
+  allWeaponPrefabs:
   - {fileID: 2338292460281037090, guid: 52c2ddcaf0810fd4d99826035bd75042, type: 3}
-  - {fileID: 2338292460281037090, guid: 52c2ddcaf0810fd4d99826035bd75042, type: 3}
+  - {fileID: 2771730616043176181, guid: d2e87b212c666e54b92f42d7db332eda, type: 3}
+  - {fileID: 5298231913516924491, guid: dcf61398706cc864c8e7017237dad517, type: 3}
+  - {fileID: 4083668476988571077, guid: 894aec4ae8c8c274991162dcd6dc8107, type: 3}
+  - {fileID: 9129109264366754805, guid: b26d96025415def4f97a85f13949f693, type: 3}
+--- !u!114 &1809690294592020227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 687279223850941216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41818890170b4f24fb9d40ad18b9307d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerController: {fileID: 363687616564066059}

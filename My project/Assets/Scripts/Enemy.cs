@@ -54,7 +54,12 @@ public abstract class Enemy : MonoBehaviour
         }
     }
 
-    void Update()
+    /// <summary>
+    /// [수정됨] void Update() -> protected virtual void Update()로 변경
+    /// protected: 자식 클래스(Boss.cs)가 접근할 수 있도록 허용
+    /// virtual: 자식 클래스가 이 함수를 재정의(override)할 수 있도록 허용
+    /// </summary>
+    protected virtual void Update()
     {
         if (player == null) return;
         float dist = Vector3.Distance(transform.position, player.position);

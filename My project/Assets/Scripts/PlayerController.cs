@@ -19,8 +19,8 @@ public class PlayerController : MonoBehaviour
     public KeyCode sprintKey = KeyCode.LeftShift; // 달리기에 사용할 키입니다.
     public bool allowRightShift = true; // 오른쪽 Shift 키로도 달리기를 허용할지 여부입니다.
 
-    [Header("점프 설정 (싱글 점프)")] // [수정] 헤더 이름을 '더블 점프 설정'에서 '점프 설정'으로 변경했습니다.
-    public int maxJumps = 1; // [수정] 최대 점프 횟수를 1로 설정하여 싱글 점프만 가능하게 했습니다.
+    [Header("점프 설정 (싱글 점프)")]
+    public int maxJumps = 1; // 최대 점프 횟수를 1로 설정하여 싱글 점프만 가능하게 했습니다.
     private int jumpCount = 0; // 현재까지 몇 번 점프했는지 저장하는 변수입니다.
 
     [Header("더 나은 점프 (Better Jumping)")]
@@ -34,15 +34,7 @@ public class PlayerController : MonoBehaviour
     public Slider hpSlider; // 체력을 표시할 UI 슬라이더입니다.
     private int currentHP; // 현재 체력을 저장하는 변수입니다.
 
-    [Header("지속 데미지 설정 (용암 바닥 등)")]
-    [Tooltip("활성화하면 땅에 닿아있을 때 주기적으로 데미지를 입습니다.")]
-    public bool enableGroundDamage = false; // 이 기능을 켤지 끌지 결정하는 스위치입니다.
-    [Tooltip("몇 초마다 데미지를 입을지 설정합니다.")]
-    public float groundDamageInterval = 1f; // 요청하신대로 1초마다 1씩 닳게 1f로 설정 (조절 가능)
-    [Tooltip("지속 데미지로 입을 데미지 양입니다.")]
-    public int groundDamageAmount = 1; // 요청하신대로 1씩 닳게 1로 설정 (조절 가능)
-
-    private float groundContactTimer = 0f; // 땅에 닿은 시간을 추적하는 내부 타이머 변수입니다.
+    // --- (지속 데미지 관련 변수 삭제됨) ---
 
     // --- 이하 private 변수들 (스크립트 내부에서만 사용) ---
     private CharacterController controller; // 물리적인 이동과 충돌을 처리하는 컴포넌트입니다.
@@ -51,7 +43,8 @@ public class PlayerController : MonoBehaviour
     public bool isGrounded; // 플레이어가 땅에 닿아있는지 여부를 나타냅니다.
     private bool isSprinting; // 현재 달리고 있는지 여부를 나타냅니다.
 
-    // (나머지 변수들은 코드 하단에서 설명합니다)
+    [HideInInspector] // 인스펙터 창에는 보이지 않지만, 다른 스크립트(StatusEffectManager)에서는 접근 가능
+    public bool canMove = true; // 이 값이 false가 되면 스턴 상태가 되어 움직일 수 없습니다.
 
     // Start() 함수는 게임 시작 시 첫 프레임이 업데이트되기 전에 한 번만 호출됩니다. (초기화 담당)
     void Start()
@@ -73,8 +66,8 @@ public class PlayerController : MonoBehaviour
         currentHP = maxHP;
         if (hpSlider != null) // hpSlider가 할당되었는지 확인
         {
-            hpSlider.maxValue = maxHP; // (예: 15)
-            hpSlider.value = currentHP;    // (예: 15) -> 이 방식(0~maxHP)으로 통일
+            hpSlider.maxValue = maxHP;
+            hpSlider.value = currentHP;
         }
     }
 
@@ -91,29 +84,18 @@ public class PlayerController : MonoBehaviour
             jumpCount = 0; // 땅에 닿았으므로 점프 횟수를 초기화합니다.
         }
 
-        // [추가된 로직] 지속 데미지 처리
-        // '지속 데미지' 기능이 활성화되어 있다면
-        if (enableGroundDamage)
-        {
-            // 현재 땅에 닿아있다면
-            if (isGrounded)
-            {
-                // 땅에 닿아있는 시간을 계속 더합니다.
-                groundContactTimer += Time.deltaTime;
+        // --- (지속 데미지 관련 로직 삭제됨) ---
 
-                // 누적된 시간이 설정한 데미지 간격(groundDamageInterval)을 넘어서면
-                if (groundContactTimer >= groundDamageInterval)
-                {
-                    TakeDamage(groundDamageAmount); // 설정된 데미지만큼 피해를 줍니다.
-                    groundContactTimer = 0f; // 타이머를 0으로 리셋하여 다음 데미지까지 다시 셉니다.
-                }
-            }
-            else
-            {
-                // 땅에서 떨어졌다면 (점프 또는 추락 중) 타이머를 0으로 리셋합니다.
-                groundContactTimer = 0f;
-            }
+        // StatusEffectManager에 의해 스턴 상태(canMove == false)가 되었는지 확인합니다.
+        if (!canMove)
+        {
+            // 스턴에 걸렸다면, 중력만 적용하고 플레이어의 조작 관련 로직을 모두 건너뜁니다.
+            velocity.y += gravity * Time.deltaTime; // 중력은 계속 적용
+            controller.Move(velocity * Time.deltaTime);
+            return; // Update 함수의 나머지 부분을 실행하지 않고 즉시 종료
         }
+
+        // (이하 기존 Update 로직 - canMove가 true일 때만 실행됨)
 
         // Tab 키를 누르면 카메라 시점을 플레이어가 보는 방향으로 초기화합니다.
         if (Input.GetKeyDown(KeyCode.Tab))
@@ -179,13 +161,13 @@ public class PlayerController : MonoBehaviour
         if (velocity.y < 0)
         {
             // 기본 중력 대신, fallMultiplier를 적용한 더 강한 중력을 적용하여 빨리 떨어지게 합니다.
-            velocity.y += gravity * fallMultiplier * Time.deltaTime; // [변경] (fallMultiplier - 1) 제거
+            velocity.y += gravity * fallMultiplier * Time.deltaTime;
         }
         // 2. 캐릭터가 위로 올라가고 있는데, 점프 키에서 손을 뗌 (짧은 점프)
         else if (velocity.y > 0 && !Input.GetKey(KeyCode.Space))
         {
             // 기본 중력 대신, lowJumpMultiplier를 적용한 더 강한 중력을 적용하여 낮은 점프를 유도합니다.
-            velocity.y += gravity * lowJumpMultiplier * Time.deltaTime; // [변경] (lowJumpMultiplier - 1) 제거
+            velocity.y += gravity * lowJumpMultiplier * Time.deltaTime;
         }
         // 3. 캐릭터가 위로 올라가는 중이고, 점프 키를 누르고 있음 (기본 점프)
         else
