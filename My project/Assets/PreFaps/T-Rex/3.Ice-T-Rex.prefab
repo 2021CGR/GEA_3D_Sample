@@ -538,7 +538,7 @@ MonoBehaviour:
   fleeSpeedMultiplier: 1.5
   hpSlider: {fileID: 3203017148287922831}
   initHpSliderOnStart: 1
-  meleeDamage: 2
+  meleeDamage: 4
   debuffType: 1
   debuffDuration: 2.5
   debuffMagnitude: 0.7

@@ -3858,7 +3858,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1229988427}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000000028118688, y: 0.76563054, z: -0.64328057, w: 0.000000033466776}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5557,7 +5557,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1615903497}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000000025149046, y: 0.8179122, z: -0.57534313, w: 0.000000035752077}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -6172,7 +6172,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1719960201}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000000022174412, y: 0.8617746, z: -0.5072914, w: 0.000000037669373}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -6596,6 +6596,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   killsToClear: 1
+  isBossStage: 1
   nextSceneName: Main
   mainMenuSceneName: Main
   stage1SceneName: Stage1

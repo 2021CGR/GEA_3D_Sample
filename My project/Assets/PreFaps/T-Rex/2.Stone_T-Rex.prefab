@@ -275,7 +275,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.044999808, y: 5.568659}
+  m_AnchoredPosition: {x: -0.044999808, y: 3.43}
   m_SizeDelta: {x: 200, y: 36.4967}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &195512049686239981
@@ -538,7 +538,7 @@ MonoBehaviour:
   fleeSpeedMultiplier: 1.5
   hpSlider: {fileID: 3167377774562168497}
   initHpSliderOnStart: 1
-  meleeDamage: 2
+  meleeDamage: 3
   debuffType: 3
   debuffDuration: 3
   debuffMagnitude: 0.5
