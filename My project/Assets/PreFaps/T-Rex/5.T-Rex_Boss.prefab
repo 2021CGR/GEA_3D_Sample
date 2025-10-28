@@ -923,7 +923,7 @@ CharacterController:
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: -0.66, y: 0, z: 2.96}
+  m_Center: {x: -0.66, y: 1.32, z: 2.96}
 --- !u!114 &3308337168211770473
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -941,6 +941,8 @@ MonoBehaviour:
   traceRange: 100
   attackRange: 100
   attackCooldown: 1.5
+  knockbackStrength: 5
+  gravity: -9.81
   maxHP: 20
   fleeHpThresholdRatio: 0.2
   fleeStopDistance: 20

@@ -15,38 +15,27 @@ public class StageClearManager : MonoBehaviour
     // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
     [Header("다음 씬 정보")]
-    [Tooltip("일반 스테이지 클리어 시 이동할 씬의 이름")]
     public string nextSceneName;
-    [Tooltip("메인 메뉴 씬의 이름 (클리어 패널 버튼용)")]
     public string mainMenuSceneName;
-    [Tooltip("재시작 시 이동할 스테이지 1 씬의 이름")]
     public string stage1SceneName;
 
     [Header("UI 연결")]
-    [Tooltip("현재 잡은 적의 수를 표시할 Text UI")]
     public Text killCountText;
-    [Tooltip("클리어 시 띄울 UI 패널 (보스 스테이지 전용)")]
     public GameObject clearPanel;
 
     private int currentKills = 0;
 
     void OnEnable()
     {
-        // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ [수정된 부분] ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
-        // GameObject를 받는 이벤트 핸들러로 등록합니다.
+        // [수정됨] GameObject를 받는 이벤트 핸들러로 등록합니다.
         Enemy.OnEnemyKilled += HandleEnemyKilled;
-        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
     }
 
     void OnDisable()
     {
-        // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ [수정된 부분] ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
-        // 등록 해제도 동일하게 변경
         Enemy.OnEnemyKilled -= HandleEnemyKilled;
-        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
     }
 
-    // Start() 함수는 기존과 동일합니다.
     void Start()
     {
         currentKills = 0;
@@ -61,12 +50,11 @@ public class StageClearManager : MonoBehaviour
     }
 
     /// <summary>
-    /// [수정됨] 적이 죽었다는 신호를 받았을 때 실행될 함수입니다.
-    /// 이제 '누가' 죽었는지(enemyObject)를 매개변수로 받습니다.
+    /// [수정됨] 적이 죽었다는 신호를 받았을 때 '누가' 죽었는지(enemyObject) 확인합니다.
     /// </summary>
     void HandleEnemyKilled(GameObject enemyObject)
     {
-        // 1. (새 로직) 보스 스테이지인지 확인
+        // 1. 보스 스테이지 모드인지 확인
         if (isBossStage)
         {
             // 보스 스테이지라면, 죽은 적이 "Boss" 태그를 가졌는지 확인
@@ -78,23 +66,28 @@ public class StageClearManager : MonoBehaviour
             // (이 아래 로직은 보스일 때만 실행됨)
         }
 
-        // 2. (기존 로직) 일반 스테이지거나, 보스 스테이지에서 보스가 죽었으면 카운트
+        // 2. 일반 스테이지거나, 보스 스테이지에서 보스가 죽었으면 카운트
         currentKills++;
         UpdateKillCountUI();
 
-        // 3. (기존 로직) 클리어 조건 확인
+        // 3. 클리어 조건 확인
         if (currentKills >= killsToClear)
         {
-            if (clearPanel != null)
+            // (보스 스테이지라면 clearPanel이 null이 아니어야 함)
+            if (clearPanel != null && isBossStage)
             {
-                // 보스 스테이지 클리어: 패널만 띄움 (무기 개수 증가 X)
                 ShowClearPanel();
             }
-            else
+            // (일반 스테이지라면 clearPanel이 null이어야 함)
+            else if (clearPanel == null && !isBossStage)
             {
-                // 일반 스테이지 클리어: 무기 개수를 1 증가시키고 다음 씬 로드
                 IncrementWeaponCount();
                 LoadNextScene();
+            }
+            // (둘 다 설정이 잘못되었을 경우를 대비한 로그)
+            else
+            {
+                Debug.LogWarning("StageClearManager의 isBossStage와 clearPanel 설정이 맞지 않습니다!");
             }
         }
     }
