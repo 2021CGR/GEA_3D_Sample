@@ -419,17 +419,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 9b66cdfe05941574094d6d7a31105afd,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9b66cdfe05941574094d6d7a31105afd,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9b66cdfe05941574094d6d7a31105afd,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9b66cdfe05941574094d6d7a31105afd,
         type: 3}
@@ -561,6 +561,7 @@ MonoBehaviour:
   traceRange: 100
   attackRange: 8
   attackCooldown: 1.5
+  knockbackStrength: 5
   maxHP: 10
   fleeHpThresholdRatio: 0.2
   fleeStopDistance: 20
@@ -568,6 +569,9 @@ MonoBehaviour:
   hpSlider: {fileID: 1576799112873056373}
   initHpSliderOnStart: 1
   meleeDamage: 2
+  debuffType: 0
+  debuffDuration: 3
+  debuffMagnitude: 0.5
 --- !u!4 &6416575630242592185 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9b66cdfe05941574094d6d7a31105afd,
