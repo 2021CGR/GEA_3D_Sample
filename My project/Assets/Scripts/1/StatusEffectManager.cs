@@ -5,7 +5,7 @@ using UnityEngine;
 /// 디버프 유형을 정의하는 열거형(Enum)입니다.
 /// 여기에 원하는 모든 디버프를 추가하여 관리할 수 있습니다.
 /// </summary>
-public enum DebuffType
+/*public enum DebuffType
 {
     None,    // 디버프 없음
     Slow,    // 느려짐 (달리기 불가 포함)
@@ -178,4 +178,4 @@ public class StatusEffectManager : MonoBehaviour
         isStunned = false;
         Debug.Log("[디버프] 스턴 해제.");
     }
-}
+}*/

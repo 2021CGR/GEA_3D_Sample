@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2814361523537045576
+--- !u!1 &2875559718919423900
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,48 +8,49 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1410335017546021624}
-  - component: {fileID: 3762090365707140647}
-  - component: {fileID: 6003381652686943078}
-  - component: {fileID: 5919468232397464859}
-  - component: {fileID: 1207408681037589563}
-  m_Layer: 6
-  m_Name: Grass
-  m_TagString: Block
+  - component: {fileID: 6615483453980829820}
+  - component: {fileID: 5430616583606002258}
+  - component: {fileID: 3861059918899044556}
+  - component: {fileID: 4245957648869650945}
+  - component: {fileID: 5503236985876486694}
+  - component: {fileID: 5087222253841590535}
+  m_Layer: 0
+  m_Name: Diamond_Drop
+  m_TagString: ItemDrop
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1410335017546021624
+--- !u!4 &6615483453980829820
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2814361523537045576}
+  m_GameObject: {fileID: 2875559718919423900}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 780.13336, y: 421.8548, z: -294.71527}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0.666, z: 1.215}
+  m_LocalScale: {x: 0.14, y: 0.14, z: 0.14}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &3762090365707140647
+--- !u!33 &5430616583606002258
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2814361523537045576}
+  m_GameObject: {fileID: 2875559718919423900}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &6003381652686943078
+--- !u!23 &3861059918899044556
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2814361523537045576}
+  m_GameObject: {fileID: 2875559718919423900}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -63,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d909758703b9b984791b33d919d6c44a, type: 2}
+  - {fileID: 2100000, guid: 818453b751faf1f408f0ae79b86d97f8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -85,13 +86,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &5919468232397464859
+--- !u!65 &4245957648869650945
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2814361523537045576}
+  m_GameObject: {fileID: 2875559718919423900}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -106,22 +107,44 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1207408681037589563
+--- !u!54 &5503236985876486694
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2875559718919423900}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &5087222253841590535
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2814361523537045576}
+  m_GameObject: {fileID: 2875559718919423900}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ddecd962827c6544b06a8084a1b0994, type: 3}
+  m_Script: {fileID: 11500000, guid: 9f6d0bdc8f923b540a39cc1f542eb28d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 1
-  maxHp: 3
-  hp: 0
-  dropCount: 1
-  mineable: 1
-  itemDropPrefab: {fileID: 2875559718919423900, guid: fd1aa8f077f090343a98d6d5c86955e0,
-    type: 3}
+  type: 4
+  count: 1

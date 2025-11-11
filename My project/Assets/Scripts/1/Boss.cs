@@ -1,5 +1,5 @@
 // 파일 이름: Boss.cs
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -177,4 +177,4 @@ public class Boss : Enemy
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, minionSpawnRange);
     }
-}
+}*/

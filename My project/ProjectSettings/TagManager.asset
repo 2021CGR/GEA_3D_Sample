@@ -7,6 +7,8 @@ TagManager:
   - RespawnFloor
   - Enemy
   - Boss
+  - Block
+  - ItemDrop
   layers:
   - Default
   - TransparentFX
@@ -14,7 +16,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Block
   - 
   - 
   - 

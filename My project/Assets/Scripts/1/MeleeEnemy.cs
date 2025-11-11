@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 
 // 'Enemy' 클래스의 모든 기능을 물려받습니다.
 public class MeleeEnemy : Enemy
@@ -60,4 +60,4 @@ public class MeleeEnemy : Enemy
             }
         }
     }
-}
+}*/
