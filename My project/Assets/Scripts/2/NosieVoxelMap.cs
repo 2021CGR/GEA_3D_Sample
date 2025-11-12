@@ -121,9 +121,6 @@ public class NosieVoxelMap : MonoBehaviour
         }
     }
 
-    // (Get3DNoise, GenerateWater, PlaceBlock, BuildNavMesh 함수는 변경 없습니다)
-    // ... (이전 코드와 동일) ...
-
     /// <summary>
     /// 광물 생성을 위한 3D 노이즈 값을 반환합니다.
     /// </summary>
