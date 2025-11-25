@@ -318,13 +318,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f2308ffc19428940a23397176242a0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inventoryUI: {fileID: 334158971}
   rayDistance: 10
   hitMask:
     serializedVersion: 2
     m_Bits: 64
   toolDamage: 1
   hitCooldown: 0.15
-  inventory: {fileID: 112410811}
+  blockDatabase:
+  - type: 0
+    prefab: {fileID: 2814361523537045576, guid: c4d9fdf0509692447909a192f4c468f3,
+      type: 3}
+  - type: 1
+    prefab: {fileID: 2814361523537045576, guid: f3e680228d9dfe747bce31b7dfcf83c6,
+      type: 3}
+  - type: 3
+    prefab: {fileID: 2814361523537045576, guid: 491268f13a30b7e4b9a727d84b4227c5,
+      type: 3}
+  - type: 4
+    prefab: {fileID: 2814361523537045576, guid: 4735e55aa8fbe8040b9535f0d13dbf62,
+      type: 3}
 --- !u!114 &112410811
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -435,6 +448,8 @@ MonoBehaviour:
   waterIcon: {fileID: 0}
   ironIcon: {fileID: 21300000, guid: 1413aedcf74a2b44b8d12ad6d94ae083, type: 3}
   diamondIcon: {fileID: 21300000, guid: bf8af11279afef74ab2f287a21e3916b, type: 3}
+  selectedColor: {r: 1, g: 0.8860918, b: 0, a: 1}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0

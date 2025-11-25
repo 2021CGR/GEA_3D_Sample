@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 6615483453980829820}
   - component: {fileID: 5430616583606002258}
   - component: {fileID: 3861059918899044556}
-  - component: {fileID: 4245957648869650945}
   - component: {fileID: 5503236985876486694}
-  - component: {fileID: 5087222253841590535}
+  - component: {fileID: 8512593424276576782}
+  - component: {fileID: -4229767373460469511}
   m_Layer: 0
   m_Name: Grass_Drop
   m_TagString: ItemDrop
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d909758703b9b984791b33d919d6c44a, type: 2}
+  - {fileID: 2100000, guid: ae8b602c367d53d4793932afb9d4ed88, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -86,27 +86,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &4245957648869650945
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2875559718919423900}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &5503236985876486694
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -116,8 +95,8 @@ Rigidbody:
   m_GameObject: {fileID: 2875559718919423900}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_Drag: 2
+  m_AngularDrag: 1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -134,7 +113,28 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &5087222253841590535
+--- !u!135 &8512593424276576782
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2875559718919423900}
+  m_Material: {fileID: 13400000, guid: f21f1a408dd580c4c936e4d2d881768f, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.2
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-4229767373460469511
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -155,3 +155,4 @@ MonoBehaviour:
   groundCheckDistance: 0.54
   groupingRadius: 1
   extraGravityForce: 8.5
+  isPickedUp: 0
