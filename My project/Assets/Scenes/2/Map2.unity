@@ -1775,10 +1775,10 @@ MonoBehaviour:
     type: 3}
   diamondPrefab: {fileID: 2814361523537045576, guid: 4735e55aa8fbe8040b9535f0d13dbf62,
     type: 3}
-  width: 30
-  depth: 30
-  maxHeight: 50
-  waterLevel: 10
+  width: 60
+  depth: 50
+  maxHeight: 17
+  waterLevel: 6
   terrainNoiseScale: 15
   oreNoiseScale: 15
   ironThreshold: 0.65

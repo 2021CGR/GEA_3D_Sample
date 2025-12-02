@@ -13,7 +13,7 @@ public class MainMenuController : MonoBehaviour
     [Header("설정")]
     // 이동할 게임 플레이 씬의 이름을 정확히 적어야 합니다.
     // (예: "SampleScene", "GameScene" 등)
-    public string gameSceneName = "GameScene";
+    public string gameSceneName = "Map1";
 
     void Start()
     {

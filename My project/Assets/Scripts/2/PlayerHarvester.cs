@@ -1,171 +1,165 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems; // UI Å¬¸¯ °¨Áö¸¦ À§ÇØ ÇÊ¿ä
-using System.Linq;
+using UnityEngine.EventSystems; // UI ìœ„ í´ë¦­ ë°©ì§€ìš©
 
 /// <summary>
-/// ÇÃ·¹ÀÌ¾îÀÇ »óÈ£ÀÛ¿ë(Ã¤±¤, °ÇÃà)À» ÃÑ°ıÇÏ´Â Å¬·¡½ºÀÔ´Ï´Ù.
-/// ±â´É:
-/// 1. ÁÂÅ¬¸¯: ·¹ÀÌÄ³½ºÆ®¸¦ ÀÌ¿ëÇÑ ºí·Ï ÆÄ±« (Ã¤±¤)
-/// 2. ¿ìÅ¬¸¯: ¼±ÅÃµÈ ºí·Ï ¼³Ä¡ (°ÇÃà)
-/// 3. ¼ıÀÚÅ°(1~0): ÀÎº¥Åä¸®¿¡ ÀÖ´Â ºí·Ï ¼±ÅÃ ¹× UI ¿¬µ¿
+/// í”Œë ˆì´ì–´ì˜ ì±„ê´‘, ê±´ì¶•, ì•„ì´í…œ ì„ íƒì„ ë‹´ë‹¹í•˜ëŠ” í†µí•© ì»¨íŠ¸ë¡¤ëŸ¬ì…ë‹ˆë‹¤.
 /// </summary>
 public class PlayerHarvester : MonoBehaviour
 {
-    // [µ¥ÀÌÅÍ ±¸Á¶] ºí·Ï Å¸ÀÔ°ú ½ÇÁ¦ ¼³Ä¡µÉ ÇÁ¸®ÆÕÀ» 1:1·Î ¸ÅÄª
+    // [ë°ì´í„° êµ¬ì¡°] ë¸”ë¡ íƒ€ì…ê³¼ í”„ë¦¬íŒ¹ì„ ì—°ê²°
     [System.Serializable]
     public struct BlockMapping
     {
-        public BlockType type;    // ³í¸®Àû Å¸ÀÔ (¿¹: Dirt)
-        public GameObject prefab; // ¹°¸®Àû ÇÁ¸®ÆÕ (¿¹: DirtPrefab)
+        public BlockType type;    // ì˜ˆ: Dirt
+        public GameObject prefab; // ì˜ˆ: DirtPrefab
     }
 
-    #region [º¯¼ö ¼³Á¤]
+    #region [1. ë³€ìˆ˜ ë° ì„¤ì •]
 
-    [Header("UI ¿¬°á (ÇÊ¼ö)")]
-    [Tooltip("ÇöÀç ¼±ÅÃµÈ ½½·ÔÀ» È­¸é¿¡ Ç¥½ÃÇÏ±â À§ÇÑ UI ½ºÅ©¸³Æ®")]
+    [Header("UI ì—°ê²°")]
+    [Tooltip("ìŠ¬ë¡¯ ì„ íƒ ì‹œ ë¹¨ê°„ í…Œë‘ë¦¬ í‘œì‹œë¥¼ ìœ„í•œ UI ìŠ¤í¬ë¦½íŠ¸")]
     public InventoryUI inventoryUI;
 
-    [Header("Ã¤±¤(Mining) ¼³Á¤")]
-    public float rayDistance = 5f;     // »óÈ£ÀÛ¿ë °¡´ÉÇÑ ÃÖ´ë °Å¸®
-    public LayerMask hitMask = ~0;     // ·¹ÀÌÄ³½ºÆ®°¡ Ãæµ¹ÇÒ ·¹ÀÌ¾î (¸ğµç ·¹ÀÌ¾î)
-    public int toolDamage = 1;         // ºí·Ï¿¡ ÀÔÈ÷´Â µ¥¹ÌÁö
-    public float hitCooldown = 0.15f;  // Ã¤±¤/°ÇÃà °£°İ (°ø°İ ¼Óµµ)
+    [Header("ì±„ê´‘(Mining) ì„¤ì •")]
+    [Tooltip("íŒ”ì´ ë‹¿ëŠ” ìµœëŒ€ ê±°ë¦¬")]
+    public float rayDistance = 5f;
 
-    [Header("°ÇÃà(Building) ¼³Á¤")]
-    [Tooltip("ÀÎ½ºÆåÅÍ¿¡¼­ ¸ğµç ºí·Ï Å¸ÀÔ°ú ÇÁ¸®ÆÕÀ» µî·ÏÇØ¾ß ÇÕ´Ï´Ù.")]
+    [Tooltip("ë ˆì´ìºìŠ¤íŠ¸ ì¶©ëŒ ë ˆì´ì–´")]
+    public LayerMask hitMask = ~0;
+
+    [Tooltip("ê¸°ë³¸ ì±„ê´‘ ë°ë¯¸ì§€ (ë§¨ì†)")]
+    public int baseDamage = 1;
+
+    [Tooltip("ì² ê²€(IronSword) ì°©ìš© ì‹œ ë°ë¯¸ì§€")]
+    public int swordDamage = 5;
+
+    [Tooltip("ê³µê²©/ê±´ì¶• ì¿¨ë‹¤ìš´ (ê´‘í´ ë°©ì§€)")]
+    public float hitCooldown = 0.15f;
+
+    [Header("ê±´ì¶•(Building) ì„¤ì •")]
+    [Tooltip("ì„¤ì¹˜ ê°€ëŠ¥í•œ ë¸”ë¡ í”„ë¦¬íŒ¹ ë¦¬ìŠ¤íŠ¸")]
     public List<BlockMapping> blockDatabase;
 
-    // ³»ºÎ µ¿ÀÛ º¯¼ö
-    private float _nextHitTime;       // ´ÙÀ½ µ¿ÀÛ °¡´É ½Ã°£ (Äğ´Ù¿î Ã¼Å©¿ë)
-    private Camera _cam;              // 1ÀÎÄª Ä«¸Ş¶ó
-    private Inventory inventory;      // ÇÃ·¹ÀÌ¾î ÀÎº¥Åä¸®
+    // ë‚´ë¶€ ë™ì‘ ë³€ìˆ˜
+    private float _nextHitTime;
+    private Camera _cam;
+    private Inventory inventory;
 
-    // ÇöÀç ÀÎº¥Åä¸®¿¡ 1°³ ÀÌ»ó º¸À¯ ÁßÀÎ ºí·Ï Å¸ÀÔ ¸ñ·Ï (ÀÚµ¿ °»½ÅµÊ)
+    // í˜„ì¬ ë³´ìœ  ì¤‘ì¸ ì•„ì´í…œ ë¦¬ìŠ¤íŠ¸ (1~9ë²ˆ í‚¤ ë§¤í•‘ìš©)
     private List<BlockType> availableBlocks = new List<BlockType>();
 
-    // ÇöÀç ¼Õ¿¡ µé°í ÀÖ´Â(¼±ÅÃµÈ) ºí·Ï Å¸ÀÔ (nullÀÌ¸é ¼±ÅÃ ¾È ÇÔ)
+    // í˜„ì¬ ì†ì— ë“¤ê³  ìˆëŠ” ì•„ì´í…œ (nullì´ë©´ ë¹ˆì†)
     private BlockType? currentSelectedBlock = null;
 
     #endregion
 
-    #region [ÃÊ±âÈ­ ¹× ÀÌº¥Æ® ¿¬°á]
+    #region [2. ì´ˆê¸°í™” ë° ì´ë²¤íŠ¸ ì—°ê²°]
 
     void Awake()
     {
-        // ÄÄÆ÷³ÍÆ® °¡Á®¿À±â
         _cam = GetComponentInChildren<Camera>();
 
-        // ÀÎº¥Åä¸® ÄÄÆ÷³ÍÆ®°¡ ¾øÀ¸¸é °¡Á®¿À°Å³ª »õ·Î Ãß°¡
-        if (inventory == null) inventory = GetComponent<Inventory>();
+        // ì¸ë²¤í† ë¦¬ ì»´í¬ë„ŒíŠ¸ ê°€ì ¸ì˜¤ê¸° ë˜ëŠ” ì¶”ê°€
+        inventory = GetComponent<Inventory>();
         if (inventory == null) inventory = gameObject.AddComponent<Inventory>();
 
-        // [Áß¿ä] ÀÎº¥Åä¸®°¡ º¯ÇÒ ¶§¸¶´Ù(È¹µæ/¼Ò¸ğ) '»ç¿ë °¡´É ¸ñ·Ï'À» °»½ÅÇÏµµ·Ï ÀÌº¥Æ® µî·Ï
+        // [ì´ë²¤íŠ¸ êµ¬ë…] ì¸ë²¤í† ë¦¬ ë³€ê²½ ì‹œ ëª©ë¡ ê°±ì‹  í•¨ìˆ˜ ì‹¤í–‰
         inventory.OnInventoryChanged += RefreshAvailableBlocks;
 
-        // UI ½ºÅ©¸³Æ® ÀÚµ¿ ¿¬°á ½Ãµµ (¾ÈÀüÀåÄ¡)
-        if (inventoryUI == null)
-            inventoryUI = FindObjectOfType<InventoryUI>();
+        // UI ìë™ ì—°ê²°
+        if (inventoryUI == null) inventoryUI = FindObjectOfType<InventoryUI>();
     }
 
     void OnDestroy()
     {
-        // ¿ÀºêÁ§Æ® ÆÄ±« ½Ã ÀÌº¥Æ® ±¸µ¶ ÇØÁ¦ (¸Ş¸ğ¸® ´©¼ö ¹æÁö)
-        if (inventory != null)
-            inventory.OnInventoryChanged -= RefreshAvailableBlocks;
+        // ì´ë²¤íŠ¸ êµ¬ë… í•´ì œ (ë©”ëª¨ë¦¬ ëˆ„ìˆ˜ ë°©ì§€)
+        if (inventory != null) inventory.OnInventoryChanged -= RefreshAvailableBlocks;
     }
 
     #endregion
 
-    #region [¾÷µ¥ÀÌÆ® ¹× ÀÔ·Â Ã³¸®]
+    #region [3. ì…ë ¥ ì²˜ë¦¬ ë° ì—…ë°ì´íŠ¸]
 
     void Update()
     {
-        // 1. Ä¿¼­°¡ Àá°ÜÀÖÁö ¾Ê°Å³ª(¸Ş´º »óÅÂ), ¸¶¿ì½º°¡ UI À§¿¡ ÀÖ´Ù¸é »óÈ£ÀÛ¿ë ±İÁö
+        // UI ëª¨ë“œì´ê±°ë‚˜ ë§ˆìš°ìŠ¤ê°€ UI ë²„íŠ¼ ìœ„ì— ìˆìœ¼ë©´ ì‘ë™ ì¤‘ì§€
         if (Cursor.lockState != CursorLockMode.Locked || EventSystem.current.IsPointerOverGameObject())
             return;
 
-        // 2. ¼ıÀÚ Å° ÀÔ·Â °¨Áö (¾ÆÀÌÅÛ ¼±ÅÃ)
         HandleInput();
 
-        // 3. ÁÂÅ¬¸¯: Ã¤±¤ (Äğ´Ù¿î Ã¼Å©)
+        // ì¢Œí´ë¦­: ì±„ê´‘
         if (Input.GetMouseButton(0) && Time.time >= _nextHitTime)
         {
             _nextHitTime = Time.time + hitCooldown;
             TryMine();
         }
 
-        // 4. ¿ìÅ¬¸¯: °ÇÃà (¼³Ä¡´Â º¸Åë ´Ü¹ß¼º ÀÔ·ÂÀÎ Down »ç¿ë)
+        // ìš°í´ë¦­: ê±´ì¶•
         if (Input.GetMouseButtonDown(1))
         {
             TryBuild();
         }
     }
 
-    /// <summary>
-    /// Å°º¸µå ¼ıÀÚÅ°(1~9, 0) ÀÔ·ÂÀ» Ã³¸®ÇÏ¿© ½½·ÔÀ» ¼±ÅÃÇÕ´Ï´Ù.
-    /// </summary>
+    // ìˆ«ìí‚¤ ì…ë ¥ ì²˜ë¦¬ (1~9, 0)
     void HandleInput()
     {
-        // Å°º¸µå 1¹ø ~ 9¹ø (KeyCode.Alpha1 ~ Alpha9)
         for (int i = 0; i < 9; i++)
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1 + i))
-            {
-                SelectSlot(i); // i´Â 0ºÎÅÍ ½ÃÀÛ (0¹ø ÀÎµ¦½º = 1¹ø Å°)
-            }
+            if (Input.GetKeyDown(KeyCode.Alpha1 + i)) SelectSlot(i);
         }
-
-        // Å°º¸µå 0¹ø (º¸Åë 10¹øÂ° ½½·ÔÀ¸·Î »ç¿ë)
-        if (Input.GetKeyDown(KeyCode.Alpha0))
-        {
-            SelectSlot(9);
-        }
+        if (Input.GetKeyDown(KeyCode.Alpha0)) SelectSlot(9);
     }
 
-    /// <summary>
-    /// Æ¯Á¤ ÀÎµ¦½ºÀÇ ¾ÆÀÌÅÛÀ» ¼±ÅÃÇÏ°í UI¸¦ ¾÷µ¥ÀÌÆ®ÇÕ´Ï´Ù.
-    /// </summary>
+    // íŠ¹ì • ìŠ¬ë¡¯ ì„ íƒ
     void SelectSlot(int index)
     {
-        // ³»°¡ °¡Áø ºí·Ï Á¾·ùº¸´Ù ´õ ³ôÀº ¹øÈ£¸¦ ´©¸£¸é ¹«½Ã
         if (index >= availableBlocks.Count) return;
 
-        // ÇöÀç ¼±ÅÃµÈ ºí·Ï ¾÷µ¥ÀÌÆ®
         currentSelectedBlock = availableBlocks[index];
 
-        // UI ½ºÅ©¸³Æ®¿¡°Ô "N¹øÂ° ½½·Ô °­Á¶ÇØÁà"¶ó°í ¿äÃ»
-        if (inventoryUI != null)
-        {
-            inventoryUI.SelectSlot(index);
-        }
+        // UI ê°±ì‹  ìš”ì²­
+        if (inventoryUI != null) inventoryUI.SelectSlot(index);
+
+        Debug.Log($"[ì•„ì´í…œ ì„ íƒ] {currentSelectedBlock}");
     }
 
     /// <summary>
-    /// ÀÎº¥Åä¸® ³»¿ëÀÌ º¯°æµÉ ¶§ È£ÃâµË´Ï´Ù.
-    /// º¸À¯·®ÀÌ 0ÀÎ ¾ÆÀÌÅÛÀº ¸ñ·Ï¿¡¼­ Á¦¿ÜÇÏ°í, ¼±ÅÃ ÁßÀÌ´ø ¾ÆÀÌÅÛÀÌ »ç¶óÁö¸é ¼±ÅÃÀ» ÇØÁ¦ÇÕ´Ï´Ù.
+    /// [í•µì‹¬ ìˆ˜ì •] ì¸ë²¤í† ë¦¬ê°€ ë³€í•  ë•Œ ëª©ë¡ì„ ê°±ì‹ í•©ë‹ˆë‹¤.
+    /// ì•„ì´í…œì´ ì¶”ê°€ë˜ì–´ ìŠ¬ë¡¯ ë²ˆí˜¸ê°€ ë°€ë ¤ë„, ë“¤ê³  ìˆë˜ ì•„ì´í…œì„ ê³„ì† ì¡ê³  ìˆë„ë¡ ì²˜ë¦¬í•©ë‹ˆë‹¤.
     /// </summary>
     void RefreshAvailableBlocks()
     {
-        availableBlocks.Clear();
+        // 1. í˜„ì¬ ì†ì— ë“¤ê³  ìˆëŠ” ì•„ì´í…œì´ ë¬´ì—‡ì¸ì§€ ê¸°ì–µí•´ë‘¡ë‹ˆë‹¤. (ì˜ˆ: IronSword)
+        BlockType? memoryBlock = currentSelectedBlock;
 
-        // ÀÎº¥Åä¸® ÀüÃ¼¸¦ ¼øÈ¸ÇÏ¸ç °³¼ö°¡ 1°³ ÀÌ»óÀÎ °Í¸¸ ¸®½ºÆ®¿¡ Ãß°¡
+        // 2. ë³´ìœ  ëª©ë¡ ì´ˆê¸°í™” ë° ì¬êµ¬ì„±
+        availableBlocks.Clear();
         foreach (var item in inventory.items)
         {
-            if (item.Value > 0)
-            {
-                availableBlocks.Add(item.Key);
-            }
+            if (item.Value > 0) availableBlocks.Add(item.Key);
         }
 
-        // ¿¹¿Ü Ã³¸®: ÇöÀç ¼Õ¿¡ µé°í ÀÖ´ø ºí·ÏÀ» ´Ù ½á¹ö·È´ÂÁö È®ÀÎ
-        if (currentSelectedBlock.HasValue)
+        // 3. [ì •ë ¬] ì•„ì´í…œ ìˆœì„œë¥¼ ì´ë¦„ìˆœìœ¼ë¡œ ì •ë ¬ (ìŠ¬ë¡¯ ìœ„ì¹˜ê°€ ë’¤ì£½ë°•ì£½ ì„ì´ëŠ” ê²ƒ ë°©ì§€)
+        availableBlocks.Sort();
+
+        // 4. [ìœ„ì¹˜ ì¶”ì ] ì•„ê¹Œ ë“¤ê³  ìˆë˜ ì•„ì´í…œì´ ì—¬ì „íˆ ë‚´ ê°€ë°©ì— ìˆëŠ”ê°€?
+        if (memoryBlock.HasValue)
         {
-            if (!inventory.items.ContainsKey(currentSelectedBlock.Value) || inventory.items[currentSelectedBlock.Value] <= 0)
+            if (availableBlocks.Contains(memoryBlock.Value))
             {
-                // ¼±ÅÃ ÇØÁ¦
+                // ê·¸ ì•„ì´í…œì´ ëª‡ ë²ˆì§¸ ì¹¸ìœ¼ë¡œ ì´ì‚¬ê°”ëŠ”ì§€ ì°¾ìŠµë‹ˆë‹¤.
+                int newIndex = availableBlocks.IndexOf(memoryBlock.Value);
+
+                // ì°¾ì€ ìœ„ì¹˜ë¥¼ ê°•ì œë¡œ ë‹¤ì‹œ ì„ íƒí•©ë‹ˆë‹¤. (UIë„ í•´ë‹¹ ìœ„ì¹˜ë¡œ ì´ë™)
+                SelectSlot(newIndex);
+            }
+            else
+            {
+                // ì•„ì´í…œì„ ë‹¤ ì¨ì„œ ì—†ì–´ì¡Œë‹¤ë©´ ì„ íƒ í•´ì œ
                 currentSelectedBlock = null;
-                // UI °­Á¶ ²ô±â (-1 Àü´Ş)
                 if (inventoryUI != null) inventoryUI.SelectSlot(-1);
             }
         }
@@ -173,77 +167,74 @@ public class PlayerHarvester : MonoBehaviour
 
     #endregion
 
-    #region [Ã¤±¤ ¹× °ÇÃà ·ÎÁ÷]
+    #region [4. ì±„ê´‘ ë° ê±´ì¶• ë¡œì§]
 
-    /// <summary>
-    /// [ÁÂÅ¬¸¯] ºí·Ï ÆÄ±« ·ÎÁ÷
-    /// </summary>
+    // ì±„ê´‘ (ë¸”ë¡ íŒŒê´´)
     void TryMine()
     {
-        // È­¸é Áß¾Ó(0.5, 0.5)¿¡¼­ ·¹ÀÌ ¹ß»ç
         Ray ray = _cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 
         if (Physics.Raycast(ray, out var hit, rayDistance, hitMask))
         {
-            // Ãæµ¹ÇÑ ¹°Ã¼¿¡¼­ Block ÄÄÆ÷³ÍÆ® È®ÀÎ
             var block = hit.collider.GetComponent<Block>();
-
-            // ºí·ÏÀÌ ¸Â´Ù¸é µ¥¹ÌÁö ÁÖ±â (Ã¤±¤)
             if (block != null)
             {
-                block.Hit(toolDamage, inventory);
+                // [ë°ë¯¸ì§€ ë¡œì§] ì² ê²€ì´ë©´ 5, ì•„ë‹ˆë©´ 1
+                int currentDamage = baseDamage;
+                if (currentSelectedBlock == BlockType.IronSword)
+                {
+                    currentDamage = swordDamage;
+                    Debug.Log("âš”ï¸ ì² ê²€ ê³µê²©! (ë°ë¯¸ì§€: " + currentDamage + ")");
+                }
+
+                block.Hit(currentDamage, inventory);
             }
         }
     }
 
-    /// <summary>
-    /// [¿ìÅ¬¸¯] ºí·Ï ¼³Ä¡ ·ÎÁ÷
-    /// </summary>
+    // ê±´ì¶• (ë¸”ë¡ ì„¤ì¹˜)
     void TryBuild()
     {
-        // 1. ¼±ÅÃµÈ ºí·ÏÀÌ ¾øÀ¸¸é Ãë¼Ò
         if (currentSelectedBlock == null) return;
 
-        // 2. ¼³Ä¡ÇÒ ÇÁ¸®ÆÕ µ¥ÀÌÅÍ °¡Á®¿À±â
+        // [ì˜ˆì™¸] ì² ê²€ì€ ì„¤ì¹˜í•  ìˆ˜ ì—†ìŒ
+        if (currentSelectedBlock == BlockType.IronSword)
+        {
+            Debug.Log("ğŸš« ë¬´ê¸°ëŠ” ì„¤ì¹˜í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+            return;
+        }
+
         GameObject prefabToSpawn = GetPrefabByType(currentSelectedBlock.Value);
         if (prefabToSpawn == null) return;
 
-        // 3. [Áß¿ä] ÀÎº¥Åä¸®¿¡¼­ ¾ÆÀÌÅÛ 1°³ ¼Ò¸ğ ½Ãµµ (½ÇÆĞ ½Ã ÇÔ¼ö Á¾·á)
-        // ¼± ¼Ò¸ğ ÈÄ ½ÇÆĞ ½Ã È¯ºÒÇÏ´Â ¹æ½ÄÀÌ ´õ ¾ÈÀüÇÔ
+        // ì¸ë²¤í† ë¦¬ì—ì„œ 1ê°œ ì†Œëª¨ ì‹œë„
         if (!inventory.Consume(currentSelectedBlock.Value, 1)) return;
 
-        // 4. ¼³Ä¡ À§Ä¡ °è»ê
         Ray ray = _cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
         if (Physics.Raycast(ray, out var hit, rayDistance, hitMask))
         {
-            // Å¬¸¯ÇÑ ÁöÁ¡(point) + Ç¥¸é ¹ı¼±(normal)ÀÇ Àı¹İ = ¼³Ä¡µÉ ºí·ÏÀÇ Áß½É ÁÂÇ¥
+            // ì„¤ì¹˜ ìœ„ì¹˜ ê³„ì‚°
             Vector3 placePoint = hit.point + (hit.normal * 0.5f);
-
-            // ÁÂÇ¥¸¦ Á¤¼ö(Grid) ´ÜÀ§·Î ¹İ¿Ã¸²ÇÏ¿© µü ¸Â°Ô Á¤·Ä
             Vector3Int finalPos = Vector3Int.RoundToInt(placePoint);
             Vector3Int playerPos = Vector3Int.RoundToInt(transform.position);
 
-            // 5. ÇÃ·¹ÀÌ¾î ³¢ÀÓ ¹æÁö (ÇÃ·¹ÀÌ¾î ¹ß ¹Ø or ¸Ó¸® À§Ä¡¿¡´Â ¼³Ä¡ ºÒ°¡)
+            // í”Œë ˆì´ì–´ ìœ„ì¹˜ ë¼ì„ ë°©ì§€
             if (finalPos == playerPos || finalPos == playerPos + Vector3Int.up)
             {
-                // ¼³Ä¡ ½ÇÆĞ: ¼Ò¸ğÇß´ø ¾ÆÀÌÅÛ È¯ºÒ
-                inventory.Add(currentSelectedBlock.Value, 1);
+                inventory.Add(currentSelectedBlock.Value, 1); // í™˜ë¶ˆ
+                Debug.Log("ğŸš« í”Œë ˆì´ì–´ ìœ„ì¹˜ì—ëŠ” ì„¤ì¹˜í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
                 return;
             }
 
-            // 6. ºí·Ï »ı¼º
             Instantiate(prefabToSpawn, finalPos, Quaternion.identity);
         }
         else
         {
-            // Çã°øÀ» Å¬¸¯Çß°Å³ª »ç°Å¸®°¡ ¾È ´êÀ½: ¾ÆÀÌÅÛ È¯ºÒ
-            inventory.Add(currentSelectedBlock.Value, 1);
+            inventory.Add(currentSelectedBlock.Value, 1); // í™˜ë¶ˆ
         }
     }
 
-    /// <summary>
-    /// ºí·Ï Å¸ÀÔ(Enum)¿¡ ÇØ´çÇÏ´Â ÇÁ¸®ÆÕ(GameObject)À» ¸®½ºÆ®¿¡¼­ Ã£¾Æ ¹İÈ¯ÇÕ´Ï´Ù.
-    /// </summary>
+    // í”„ë¦¬íŒ¹ ê²€ìƒ‰ í—¬í¼ í•¨ìˆ˜
     GameObject GetPrefabByType(BlockType type)
     {
         foreach (var mapping in blockDatabase)

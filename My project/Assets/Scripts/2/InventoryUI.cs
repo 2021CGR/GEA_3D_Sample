@@ -10,9 +10,9 @@ using TMPro;
 public class InventoryUI : MonoBehaviour
 {
     [Header("연결 필수")]
-    public Inventory inventory;       // 데이터 소스
-    public Transform slotContainer;   // 슬롯들이 생성될 부모 패널
-    public GameObject slotPrefab;     // 슬롯 프리팹
+    public Inventory inventory;       // 데이터 소스 (플레이어 인벤토리)
+    public Transform slotContainer;   // 슬롯들이 생성될 부모 패널 (Content 등)
+    public GameObject slotPrefab;     // 슬롯 프리팹 (Icon, CountText 포함)
 
     [Header("아이콘 리소스")]
     public Sprite dirtIcon;
@@ -25,7 +25,9 @@ public class InventoryUI : MonoBehaviour
     public Color selectedColor = Color.red;   // 선택 시 배경색
     public Color normalColor = Color.white;   // 평상시 배경색
 
+    // 생성된 슬롯 오브젝트들을 관리하는 리스트
     private List<GameObject> activeSlots = new List<GameObject>();
+    // 블록 타입별 아이콘을 찾기 위한 딕셔너리
     private Dictionary<BlockType, Sprite> iconMap = new Dictionary<BlockType, Sprite>();
 
     // 현재 선택된 슬롯 번호
@@ -35,17 +37,17 @@ public class InventoryUI : MonoBehaviour
     {
         InitializeIconMap();
 
-        // 인벤토리 변경 이벤트 구독
+        // 인벤토리 변경 이벤트 구독 (데이터가 변하면 UpdateUI 자동 실행)
         if (inventory != null)
         {
             inventory.OnInventoryChanged += UpdateUI;
         }
-        UpdateUI();
+        UpdateUI(); // 초기화 시 한번 그리기
     }
 
     void OnDestroy()
     {
-        // 이벤트 구독 해제 (메모리 누수 방지)
+        // 이벤트 구독 해제 (메모리 누수 방지, 필수!)
         if (inventory != null)
         {
             inventory.OnInventoryChanged -= UpdateUI;
@@ -62,18 +64,18 @@ public class InventoryUI : MonoBehaviour
     }
 
     /// <summary>
-    /// 모든 슬롯을 지우고 다시 그리는 함수
+    /// 모든 슬롯을 지우고 다시 그리는 함수 (단순한 방식)
     /// </summary>
     public void UpdateUI()
     {
-        // 기존 슬롯 삭제
+        // 1. 기존 슬롯 모두 삭제
         foreach (GameObject slot in activeSlots)
         {
             Destroy(slot);
         }
         activeSlots.Clear();
 
-        // 인벤토리를 순회하며 슬롯 생성
+        // 2. 인벤토리를 순회하며 슬롯 새로 생성
         foreach (var item in inventory.items)
         {
             BlockType type = item.Key;
@@ -83,17 +85,18 @@ public class InventoryUI : MonoBehaviour
 
             GameObject newSlot = Instantiate(slotPrefab, slotContainer);
 
-            // UI 컴포넌트 연결
+            // 자식 컴포넌트 찾기 (이름으로 찾기)
             Image iconImage = newSlot.transform.Find("Icon").GetComponent<Image>();
             TextMeshProUGUI countText = newSlot.transform.Find("CountText").GetComponent<TextMeshProUGUI>();
 
+            // 데이터 적용
             iconImage.sprite = GetIcon(type);
             countText.text = count.ToString();
 
             activeSlots.Add(newSlot);
         }
 
-        // 재생성 후 선택 상태 다시 적용
+        // 3. 재생성 후 선택 상태 다시 적용 (슬롯이 바뀌었으므로 색상 다시 칠하기)
         RefreshSelectionVisual();
     }
 
@@ -104,7 +107,7 @@ public class InventoryUI : MonoBehaviour
     }
 
     /// <summary>
-    /// 외부에서 "N번째 슬롯 선택해줘"라고 요청하는 함수
+    /// 외부(입력 시스템)에서 "N번째 슬롯 선택해줘"라고 요청하는 함수
     /// </summary>
     public void SelectSlot(int index)
     {
