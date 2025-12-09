@@ -5,46 +5,46 @@ using UnityEngine;
 using UnityEngine.AI;
 
 /// <summary>
-/// ¸Ê »ı¼º, NavMesh ºôµå, ÇÃ·¹ÀÌ¾î ½ºÆùÀ» °ü¸®ÇÏ´Â ¿ùµå ¸Å´ÏÀúÀÔ´Ï´Ù.
-/// Perlin Noise ¾Ë°í¸®ÁòÀ» »ç¿ëÇÏ¿© ÁöÇüÀ» ÀıÂ÷ÀûÀ¸·Î »ı¼ºÇÕ´Ï´Ù.
+/// ì§€í˜• ìƒì„±, NavMesh ë¹Œë“œ, í”Œë ˆì´ì–´ ìŠ¤í°ì„ ë‹´ë‹¹í•˜ëŠ” ì›”ë“œ ê´€ë¦¬ìì…ë‹ˆë‹¤.
+/// Perlin Noise ê¸°ë°˜ìœ¼ë¡œ ì§€í˜•ê³¼ ê´‘ë¬¼ ë¶„í¬ë¥¼ ìƒì„±í•©ë‹ˆë‹¤.
 /// </summary>
 public class NosieVoxelMap : MonoBehaviour
 {
-    [Header("ºí·Ï ÇÁ¸®ÆÕ ¿¬°á")]
-    public GameObject grassPrefab;   // ÀÜµğ ºí·Ï
-    public GameObject dirtPrefab;    // Èë ºí·Ï
-    public GameObject waterPrefab;   // ¹° ºí·Ï
-    public GameObject ironPrefab;    // Ã¶ ±¤¼®
-    public GameObject diamondPrefab; // ´ÙÀÌ¾Æ¸óµå
+    [Header("ë¸”ë¡ í”„ë¦¬íŒ¹ ì°¸ì¡°")]
+    public GameObject grassPrefab;   // ì”ë””
+    public GameObject dirtPrefab;    // í™
+    public GameObject waterPrefab;   // ë¬¼
+    public GameObject ironPrefab;    // ì² 
+    public GameObject diamondPrefab; // ë‹¤ì´ì•„ëª¬ë“œ
 
-    [Header("¸Ê Å©±â ¼³Á¤")]
-    public int width = 20;       // ¸Ê °¡·Î Å©±â
-    public int depth = 20;       // ¸Ê ¼¼·Î Å©±â
-    public int maxHeight = 16;   // ÃÖ´ë ³ôÀÌ
-    public int waterLevel = 5;   // ¼ö¸é ³ôÀÌ
+    [Header("ë§µ í¬ê¸° ì„¤ì •")]
+    public int width = 20;       // ê°€ë¡œ í¬ê¸°
+    public int depth = 20;       // ì„¸ë¡œ í¬ê¸°
+    public int maxHeight = 16;   // ìµœëŒ€ ë†’ì´
+    public int waterLevel = 5;   // ë¬¼ ë†’ì´
 
-    [Header("³ëÀÌÁî(ÁöÇü) ¼³Á¤")]
-    [SerializeField] float terrainNoiseScale = 20f; // ÁöÇüÀÇ ±¼°î ºóµµ (Å¬¼ö·Ï ¿Ï¸¸ÇÔ)
-    [SerializeField] float oreNoiseScale = 10f;     // ±¤¹° ºĞÆ÷ÀÇ ºóµµ
-    [SerializeField] float ironThreshold = 0.7f;    // Ã¶ »ı¼º È®·ü (³ôÀ»¼ö·Ï Èñ±Í)
-    [SerializeField] float diamondThreshold = 0.85f;// ´ÙÀÌ¾Æ »ı¼º È®·ü
+    [Header("ë…¸ì´ì¦ˆ(ê´‘ë¬¼) ì„¤ì •")]
+    [SerializeField] float terrainNoiseScale = 20f; // ì§€í˜• ë…¸ì´ì¦ˆ ìŠ¤ì¼€ì¼(ê°’ì´ í´ìˆ˜ë¡ ì™„ë§Œ)
+    [SerializeField] float oreNoiseScale = 10f;     // ê´‘ë¬¼ ë…¸ì´ì¦ˆ ìŠ¤ì¼€ì¼
+    [SerializeField] float ironThreshold = 0.7f;    // ì²  ìƒì„± ì„ê³„ê°’
+    [SerializeField] float diamondThreshold = 0.85f;// ë‹¤ì´ì•„ ìƒì„± ì„ê³„ê°’
 
-    [Header("ÇÃ·¹ÀÌ¾î ¹× AI")]
+    [Header("í”Œë ˆì´ì–´ ë° AI")]
     public GameObject playerPrefab;
-    public NavMeshSurface navMeshSurface; // NavMesh º£ÀÌÅ©¿ë ÄÄÆ÷³ÍÆ®
+    public NavMeshSurface navMeshSurface; // NavMesh ï¿½ï¿½ï¿½ï¿½Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 
-    // ³»ºÎ º¯¼ö: ºí·Ï Áßº¹ »ı¼º ¹æÁö ¹× ½ºÆù À§Ä¡ ÀúÀå
+    // ì ìœ  ì¢Œí‘œ: ì¤‘ë³µ ìƒì„± ë°©ì§€ ë° ìŠ¤í° ìœ„ì¹˜ ê³„ì‚°
     private HashSet<Vector3Int> occupiedPositions = new HashSet<Vector3Int>();
     private List<Vector3Int> validSpawnPoints = new List<Vector3Int>();
 
-    // ³ëÀÌÁî ½Ãµå°ª (¸Å¹ø ´Ù¸¥ ¸ÊÀ» ¸¸µé±â À§ÇÔ)
+    // ê´‘ë¬¼ ë…¸ì´ì¦ˆ ì˜¤í”„ì…‹(ê° ì¶•ë§ˆë‹¤ ë‹¤ë¥¸ ë‚œìˆ˜ ì ìš©)
     private float offsetX_ore;
     private float offsetY_ore;
     private float offsetZ_ore;
 
     void Start()
     {
-        // 1. ·£´ı ½Ãµå »ı¼º (¸Å ½ÇÇà¸¶´Ù ´Ù¸¥ ÆĞÅÏÀÇ ³ëÀÌÁî°¡ ³ª¿É´Ï´Ù)
+        // 1. ì˜¤í”„ì…‹ ë‚œìˆ˜ ì´ˆê¸°í™”(ê° ì‹¤í–‰ë§ˆë‹¤ ë‹¤ë¥¸ ì§€í˜•/ê´‘ë¬¼ ë°°ì¹˜)
         float offsetX_terrain = Random.Range(0f, 9999f);
         float offsetZ_terrain = Random.Range(0f, 9999f);
 
@@ -52,15 +52,15 @@ public class NosieVoxelMap : MonoBehaviour
         offsetY_ore = Random.Range(10000f, 19999f);
         offsetZ_ore = Random.Range(10000f, 19999f);
 
-        // 2. ¿ùµå »ı¼º ÇÁ·Î¼¼½º ½ÃÀÛ
-        GenerateTerrain(offsetX_terrain, offsetZ_terrain); // ÁöÇü ºí·Ï ¹èÄ¡
-        GenerateWater();                                   // ºó °÷¿¡ ¹° Ã¤¿ì±â
-        BuildNavMesh();                                    // AI ÀÌµ¿ °æ·Î °è»ê
-        SpawnPlayer();                                     // ÇÃ·¹ÀÌ¾î ¹èÄ¡
+        // 2. ìƒì„± ìˆœì„œ
+        GenerateTerrain(offsetX_terrain, offsetZ_terrain); // ì§€í˜• ë¸”ë¡ ë°°ì¹˜
+        GenerateWater();                                   // ë¬¼ ì±„ìš°ê¸°
+        BuildNavMesh();                                    // AI ì´ë™ ê²½ë¡œ ë¹Œë“œ
+        SpawnPlayer();                                     // í”Œë ˆì´ì–´ ìŠ¤í°
     }
 
     /// <summary>
-    /// ³ëÀÌÁî¸¦ ±â¹İÀ¸·Î ¶¥°ú ±¤¹°À» »ı¼ºÇÕ´Ï´Ù.
+    /// ì§€í˜•(ë¸”ë¡)ì„ ìƒì„±í•©ë‹ˆë‹¤.
     /// </summary>
     void GenerateTerrain(float offsetX, float offsetZ)
     {
@@ -68,33 +68,33 @@ public class NosieVoxelMap : MonoBehaviour
         {
             for (int z = 0; z < depth; z++)
             {
-                // ÆŞ¸° ³ëÀÌÁî·Î ÇØ´ç (x, z) À§Ä¡ÀÇ ³ôÀÌ(y)¸¦ °è»êÇÕ´Ï´Ù.
+                // Perlin Noiseë¡œ í•´ë‹¹ (x, z)ì˜ ë†’ì´(y)ë¥¼ ê³„ì‚°í•©ë‹ˆë‹¤.
                 float nx = (x + offsetX) / terrainNoiseScale;
                 float nz = (z + offsetZ) / terrainNoiseScale;
                 float noise = Mathf.PerlinNoise(nx, nz);
 
-                // 0~1 »çÀÌÀÇ ³ëÀÌÁî °ªÀ» ½ÇÁ¦ ³ôÀÌ Á¤¼ö·Î º¯È¯
+                // 0~1 ê°’ì„ ìµœëŒ€ ë†’ì´ì— ë§¤í•‘í•´ ì •ìˆ˜ ë†’ì´ë¡œ ë³€í™˜
                 int h = Mathf.FloorToInt(noise * maxHeight);
 
-                if (h <= 0) continue; // ³ôÀÌ°¡ 0 ÀÌÇÏ¶ó¸é »ı¼º ¾È ÇÔ
+                if (h <= 0) continue; // ë†’ì´ê°€ 0 ì´í•˜ë©´ ìŠ¤í‚µ
 
-                // ¹Ù´Ú(0)ºÎÅÍ °è»êµÈ ³ôÀÌ(h)±îÁö ºí·ÏÀ» ½×¾Æ ¿Ã¸³´Ï´Ù.
+                // ë°”ë‹¥(0)ë¶€í„° ë†’ì´(h)ê¹Œì§€ ë¸”ë¡ì„ ìŒ“ìŠµë‹ˆë‹¤.
                 for (int y = 0; y < h; y++)
                 {
-                    if (y == h - 1) // °¡Àå ²À´ë±â Ãş (Ç¥¸é)
+                    if (y == h - 1) // ìµœìƒë‹¨ ë ˆì´ì–´(í‘œë©´)
                     {
-                        // Ç¥¸éÀº ¹«Á¶°Ç ÀÜµğ
+                        // í‘œë©´ì€ ì”ë””
                         PlaceBlock(grassPrefab, x, y, z, BlockType.Grass, 3, 1, true);
 
-                        // ¹° ³ôÀÌº¸´Ù ³ô´Ù¸é ÇÃ·¹ÀÌ¾î°¡ ½ºÆùµÉ ¼ö ÀÖ´Â ¾ÈÀüÇÑ Àå¼Ò·Î ±â·Ï
+                        // ìˆ˜ë©´ë³´ë‹¤ ë†’ìœ¼ë©´ í”Œë ˆì´ì–´ ìŠ¤í° ê°€ëŠ¥í•œ ì¢Œí‘œ ì €ì¥
                         if (y > waterLevel)
                         {
                             validSpawnPoints.Add(new Vector3Int(x, y + 1, z));
                         }
                     }
-                    else // Ç¥¸é ¾Æ·¡ (ÁöÇÏ)
+                    else // í‘œë©´ ì•„ë˜(ì§€í•˜)
                     {
-                        // 3D ³ëÀÌÁî¸¦ »ç¿ëÇÏ¿© ±¤¹° ¹èÄ¡ ¿©ºÎ °áÁ¤
+                        // 3D ë…¸ì´ì¦ˆë¥¼ ì´ìš©í•´ ê´‘ë¬¼ ë°°ì¹˜ ê²°ì •
                         float oreNoise = Get3DNoise(x, y, z);
 
                         if (oreNoise > diamondThreshold)
@@ -104,7 +104,7 @@ public class NosieVoxelMap : MonoBehaviour
                         else
                             PlaceBlock(dirtPrefab, x, y, z, BlockType.Dirt, 3, 1, true);
                     }
-                    // ºí·ÏÀÌ »ı¼ºµÈ À§Ä¡ ±â·Ï (³ªÁß¿¡ ¹° »ı¼º ½Ã °ãÄ¡Áö ¾Ê°Ô)
+                    // ì ìœ  ì¢Œí‘œ ê¸°ë¡(ë¬¼ ì±„ìš°ê¸° ì‹œ ì¤‘ë³µ ë°©ì§€)
                     occupiedPositions.Add(new Vector3Int(x, y, z));
                 }
             }
@@ -112,7 +112,8 @@ public class NosieVoxelMap : MonoBehaviour
     }
 
     /// <summary>
-    /// 3Â÷¿ø ÁÂÇ¥¿¡ ´ëÇÑ ³ëÀÌÁî °ªÀ» °è»êÇÕ´Ï´Ù. (3¸éÀÇ ³ëÀÌÁî Æò±Õ°ª »ç¿ë)
+    /// 3ì¶• ì¢Œí‘œ ê¸°ë°˜ìœ¼ë¡œ ê´‘ë¬¼ ë…¸ì´ì¦ˆë¥¼ ê³„ì‚°í•©ë‹ˆë‹¤.
+    /// (ì—¬ëŸ¬ í‰ë©´ ë…¸ì´ì¦ˆë¥¼ í‰ê· )
     /// </summary>
     float Get3DNoise(int x, int y, int z)
     {
@@ -120,12 +121,12 @@ public class NosieVoxelMap : MonoBehaviour
         float ny = (y + offsetY_ore) / oreNoiseScale;
         float nz = (z + offsetZ_ore) / oreNoiseScale;
 
-        // XY, XZ, YZ Æò¸éÀÇ ³ëÀÌÁî¸¦ Æò±Õ³»¾î 3D Áú°¨À» Èä³»³À´Ï´Ù.
+        // XY, XZ, YZ í‰ë©´ ë…¸ì´ì¦ˆë¥¼ í‰ê· ë‚´ì–´ 3D ê°’ìœ¼ë¡œ ë§Œë“­ë‹ˆë‹¤.
         return (Mathf.PerlinNoise(nx, ny) + Mathf.PerlinNoise(nx, nz) + Mathf.PerlinNoise(ny, nz)) / 3f;
     }
 
     /// <summary>
-    /// ÁöÇüÀÌ ¾ø´Â ºó °ø°£ Áß, ¼ö¸é ³ôÀÌ ÀÌÇÏÀÎ °÷¿¡ ¹°À» Ã¤¿ó´Ï´Ù.
+    /// ë¬¼ ë†’ì´ ì´í•˜ì˜ ë¹ˆ ê³µê°„ì— ë¬¼ì„ ì±„ì›ë‹ˆë‹¤.
     /// </summary>
     void GenerateWater()
     {
@@ -137,7 +138,7 @@ public class NosieVoxelMap : MonoBehaviour
                 {
                     Vector3Int pos = new Vector3Int(x, y, z);
 
-                    // ÀÌ¹Ì ºí·ÏÀÌ ÀÖ´Â °÷ÀÌ¸é ÆĞ½º
+                    // ì´ë¯¸ ë¸”ë¡ì´ ì¡´ì¬í•˜ë©´ ìƒëµ
                     if (!occupiedPositions.Contains(pos))
                     {
                         PlaceBlock(waterPrefab, x, y, z, BlockType.Water, 1, 0, false);
@@ -148,17 +149,17 @@ public class NosieVoxelMap : MonoBehaviour
     }
 
     /// <summary>
-    /// ½ÇÁ¦ ºí·Ï ¿ÀºêÁ§Æ®¸¦ ÀÎ½ºÅÏ½ºÈ­ÇÏ°í ¼Ó¼ºÀ» ¼³Á¤ÇÕ´Ï´Ù.
+    /// ë¸”ë¡ í”„ë¦¬íŒ¹ì„ ì¸ìŠ¤í„´ìŠ¤í™”í•˜ê³  ì†ì„±ì„ ì„¤ì •í•©ë‹ˆë‹¤.
     /// </summary>
     void PlaceBlock(GameObject prefab, int x, int y, int z, BlockType type, int hp, int drop, bool mineable)
     {
         var go = Instantiate(prefab, new Vector3(x, y, z), Quaternion.identity, transform);
-        go.name = $"{type}_{x}_{y}_{z}"; // µğ¹ö±ëÇÏ±â ½±°Ô ÀÌ¸§ º¯°æ
+        go.name = $"{type}_{x}_{y}_{z}"; // ë””ë²„ê¹…ìš© ì´ë¦„
 
-        // ºí·Ï ½ºÅ©¸³Æ® °¡Á®¿À±â ¶Ç´Â Ãß°¡ÇÏ±â
+        // Block ì»´í¬ë„ŒíŠ¸ê°€ ì—†ìœ¼ë©´ ì¶”ê°€
         var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
 
-        // ºí·Ï ¼Ó¼º ÁÖÀÔ
+        // ì†ì„± ì„¤ì •
         b.type = type;
         b.maxHp = hp;
         b.dropCount = drop;
@@ -167,16 +168,16 @@ public class NosieVoxelMap : MonoBehaviour
 
     void BuildNavMesh()
     {
-        if (navMeshSurface != null) navMeshSurface.BuildNavMesh();
+        if (navMeshSurface != null) navMeshSurface.BuildNavMesh(); // NavMesh ë¹Œë“œ
     }
 
     void SpawnPlayer()
     {
         if (playerPrefab == null || validSpawnPoints.Count == 0) return;
 
-        // ¾ÈÀüÇÑ ½ºÆù À§Ä¡ Áß ·£´ı ¼±ÅÃ
+        // ì €ì¥ëœ ìŠ¤í° ì¢Œí‘œì—ì„œ ë¬´ì‘ìœ„ ì„ íƒ
         Vector3 spawnPos = validSpawnPoints[Random.Range(0, validSpawnPoints.Count)];
-        spawnPos.y += 0.5f; // ¹Ù´Ú¿¡ ³¢Áö ¾Êµµ·Ï »ìÂ¦ ¶ç¿ò
+        spawnPos.y += 0.5f; // ìˆ˜ë©´ ìœ„ì—ì„œ ì•ˆì „íˆ ìŠ¤í°ë˜ë„ë¡ ì˜¤í”„ì…‹
 
         Instantiate(playerPrefab, spawnPos, Quaternion.identity);
     }

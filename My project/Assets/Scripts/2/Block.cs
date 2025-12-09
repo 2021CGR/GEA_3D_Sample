@@ -1,31 +1,31 @@
 using UnityEngine;
 
-// ºí·Ï Á¾·ù Á¤ÀÇ
+// ë¸”ë¡ íƒ€ì… ì •ì˜
 public enum BlockType { Dirt, Grass, Water, Iron, Diamond, IronSword }
 
 public class Block : MonoBehaviour
 {
-    [Header("ºí·Ï ¼Ó¼º")]
+    [Header("ë¸”ë¡ ì†ì„±")]
     public BlockType type = BlockType.Dirt;
-    public int maxHp = 3;         // Ã¤±¤ ³»±¸µµ
-    public int dropCount = 1;     // ¾ÆÀÌÅÛ µå·Ó °³¼ö
-    public bool mineable = true;  // Ä¶ ¼ö ÀÖ´Â°¡?
+    public int maxHp = 3;         // ìµœëŒ€ ì²´ë ¥
+    public int dropCount = 1;     // ë“œë ê°œìˆ˜
+    public bool mineable = true;  // ì±„ê´‘ ê°€ëŠ¥ ì—¬ë¶€
 
     [HideInInspector] public int hp;
 
-    [Header("µå·Ó ¼³Á¤")]
-    public GameObject itemDropPrefab; // µå·ÓµÉ ¾ÆÀÌÅÛ ÇÁ¸®ÆÕ (ItemDrop ½ºÅ©¸³Æ® Æ÷ÇÔ)
+    [Header("ë“œë ì„¤ì •")]
+    public GameObject itemDropPrefab; // ë“œë ì•„ì´í…œ í”„ë¦¬íŒ¹(ItemDrop ìŠ¤í¬ë¦½íŠ¸ í¬í•¨)
 
     void Awake()
     {
         hp = maxHp;
 
-        // ÅÂ±× ¹× Äİ¶óÀÌ´õ ÀÚµ¿ ¼³Á¤ (½Ç¼ö ¹æÁö)
+        // ì½œë¼ì´ë”/íƒœê·¸ ìë™ ì„¤ì •(ì•ˆì „ ì¥ì¹˜)
         if (GetComponent<Collider>() == null) gameObject.AddComponent<BoxCollider>();
         if (string.IsNullOrEmpty(gameObject.tag) || gameObject.tag == "Untagged") gameObject.tag = "Block";
     }
 
-    // ¿ÜºÎ¿¡¼­ ÇÃ·¹ÀÌ¾î°¡ ÀÌ ºí·ÏÀ» ¶§·ÈÀ» ¶§ È£Ãâ
+    // í”Œë ˆì´ì–´ê°€ ë¸”ë¡ì„ íƒ€ê²©í–ˆì„ ë•Œ í˜¸ì¶œ
     public void Hit(int damage, Inventory inven)
     {
         if (!mineable) return;
@@ -33,22 +33,22 @@ public class Block : MonoBehaviour
         hp -= damage;
         if (hp <= 0)
         {
-            SpawnItemDrop();     // ¾ÆÀÌÅÛ »ı¼º
-            Destroy(gameObject); // ºí·Ï ÆÄ±«
+            SpawnItemDrop();     // ë“œë ìƒì„±
+            Destroy(gameObject); // ë¸”ë¡ ì œê±°
         }
     }
 
-    // ¾ÆÀÌÅÛ »ı¼º ¹× Æ¢¾î ¿À¸£´Â È¿°ú
+    // ë“œë ìƒì„± ë° íŠ•ê¹€(ë¬¼ë¦¬) íš¨ê³¼
     void SpawnItemDrop()
     {
         if (itemDropPrefab == null || dropCount <= 0) return;
 
-        // ºí·Ï Áß½Éº¸´Ù ¾à°£ À§, ´ë°¢¼±¿¡¼­ »ı¼ºÇÏ¿© °ãÄ§ ¹æÁö
+        // ë¸”ë¡ ì¤‘ì‹¬ì—ì„œ ì•½ê°„ ìœ„, ëœë¤ ë°©í–¥ í˜ì„ ì£¼ì–´ íŠ•ê¸°ê²Œ í•¨
         Vector3 spawnPos = transform.position + new Vector3(0.5f, 0.5f, 0.5f);
         GameObject drop = Instantiate(itemDropPrefab, spawnPos, Quaternion.identity);
         drop.tag = "ItemDrop";
 
-        // »ı¼ºµÈ ¾ÆÀÌÅÛ¿¡ µ¥ÀÌÅÍ Àü´Ş
+        // ë“œë ìŠ¤í¬ë¦½íŠ¸ì— íƒ€ì…/ìˆ˜ëŸ‰ ì„¤ì •
         ItemDrop itemScript = drop.GetComponent<ItemDrop>();
         if (itemScript != null)
         {
@@ -56,18 +56,18 @@ public class Block : MonoBehaviour
             itemScript.count = this.dropCount;
         }
 
-        // Æ¢¾î ¿À¸£´Â ¹°¸® È¿°ú Àû¿ë (Æã ÅÍÁö´Â ´À³¦)
+        // ë¬¼ë¦¬(íŠ€ê¹€/íšŒì „) íš¨ê³¼ ì ìš©
         Rigidbody rb = drop.GetComponent<Rigidbody>();
         if (rb != null)
         {
-            // ·£´ıÇÑ ¹æÇâÀ¸·Î »ìÂ¦ Æ¢°Ô ÇÔ
+            // ìœ„ë¡œ íŠ•ê¸°ê³  ìˆ˜í‰ ë°©í–¥ì€ ëœë¤
             float upForce = Random.Range(2f, 3f);
             float horizontalForce = Random.Range(0.5f, 1.0f);
             Vector3 randomDir = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f)).normalized;
 
             rb.AddForce(Vector3.up * upForce + randomDir * horizontalForce, ForceMode.Impulse);
 
-            // ·£´ı È¸Àü Ãß°¡ (»ıµ¿°¨)
+            // ëœë¤ íšŒì „ ì¶”ê°€(ê°€ë²¼ì›€ í‘œí˜„)
             float randomTorque = Random.Range(-5f, 5f);
             rb.AddTorque(new Vector3(randomTorque, randomTorque, randomTorque), ForceMode.Impulse);
         }

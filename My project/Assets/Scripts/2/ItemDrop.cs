@@ -3,38 +3,38 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// µå·ÓµÈ ¾ÆÀÌÅÛÀÇ ¹°¸® µ¿ÀÛÀ» Á¦¾îÇÕ´Ï´Ù.
-/// ¶³¾îÁú ¶§´Â ¹°¸® ¿£ÁøÀ» »ç¿ëÇÏ°í, ÂøÁöÇÏ¸é µÕµÕ ¶ß´Â ¾Ö´Ï¸ŞÀÌ¼ÇÀ¸·Î ÀüÈ¯µË´Ï´Ù.
+/// ì›”ë“œì— ë–¨ì–´ì§„ ì•„ì´í…œì„ í‘œí˜„í•©ë‹ˆë‹¤.
+/// ë–¨ì–´ì§ˆ ë•Œ ë¬¼ë¦¬ë¡œ íŠ•ê¸°ê³ , ë°”ë‹¥ì— ì•ˆì°©í•˜ë©´ ë¶€ìœ /íšŒì „í•˜ë©° ë™ì¼ ì•„ì´í…œë¼ë¦¬ í•©ì³ì§‘ë‹ˆë‹¤.
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(SphereCollider))]
 public class ItemDrop : MonoBehaviour
 {
-    public BlockType type; // ¾ÆÀÌÅÛ Á¾·ù
-    public int count = 1;  // °³¼ö
+    public BlockType type; // ì•„ì´í…œ ì¢…ë¥˜
+    public int count = 1;  // ìˆ˜ëŸ‰
 
-    [Header("µÕµÕ ¶ß±â ¼³Á¤")]
-    public float floatHeight = 0.05f;     // À§¾Æ·¡ Èçµé¸² Æø
-    public float baseFloatHeight = 0.1f;  // ¹Ù´Ú¿¡¼­ ¶ç¿ì´Â ±âº» ³ôÀÌ
-    public float floatSpeed = 2f;         // Èçµé¸®´Â ¼Óµµ
-    public float rotateSpeed = 50f;       // È¸Àü ¼Óµµ
+    [Header("ë¶€ìœ  ì—°ì¶œ ì„¤ì •")]
+    public float floatHeight = 0.05f;     // ìƒí•˜ ë°”ìš´ì‹± ë†’ì´
+    public float baseFloatHeight = 0.1f;  // ë°”ë‹¥ ìœ„ ê¸°ë³¸ ë†’ì´
+    public float floatSpeed = 2f;         // ë°”ìš´ì‹± ì†ë„
+    public float rotateSpeed = 50f;       // íšŒì „ ì†ë„
 
-    [Header("³«ÇÏ ¹× °¨Áö ¼³Á¤")]
-    public float extraGravityForce = 10f; // »¡¸® ¶³¾îÁö°Ô ÇÏ´Â Ãß°¡ Áß·Â
-    public float groupingRadius = 1.0f;   // ÁÖº¯ ¾ÆÀÌÅÛ ÇÕÄ¡±â °¨Áö ¹üÀ§
+    [Header("ë‚™í•˜/ê·¸ë£¹í™” ë¬¼ë¦¬ ì„¤ì •")]
+    public float extraGravityForce = 10f; // ë‚™í•˜ ì¤‘ ì¶”ê°€ ì¤‘ë ¥
+    public float groupingRadius = 1.0f;   // ì£¼ë³€ ì•„ì´í…œ í•©ì¹˜ê¸° ë°˜ê²½
 
-    // [Áß¿ä] ÀÌ¹Ì È¹µæµÈ ¾ÆÀÌÅÛÀÎÁö Ç¥½Ã (Áßº¹ È¹µæ ¹ö±× ¹æÁö)
+    // [ì¤‘ë³µ ë°©ì§€] ì´ë¯¸ ìˆ˜ê±°ëœ ìƒíƒœ í‘œì‹œ(ì¤‘ë³µ í”½ì—… ë°©ì§€)
     [HideInInspector] public bool isPickedUp = false;
 
-    // ³»ºÎ º¯¼ö
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     private Rigidbody rb;
-    private Vector3 initialPosition; // µÕµÕ ¶ß±â ½ÃÀÛÇÑ ±âÁØ ÁÂÇ¥
-    private bool isFloating = false; // ÇöÀç µÕµÕ ¶ß´Â ÁßÀÎ°¡?
-    private bool isMerging = false;  // ÇÕÃÄÁö´Â ÁßÀÎ°¡?
-    private SphereCollider groupingTrigger; // ÇÕÄ¡±â °¨Áö¿ë Æ®¸®°Å
-    private SphereCollider physicsCollider; // ½ÇÁ¦ ¹°¸® Ãæµ¹¿ë
+    private Vector3 initialPosition; // ë¶€ìœ  ì‹œì‘ ê¸°ì¤€ ìœ„ì¹˜
+    private bool isFloating = false; // ë¶€ìœ  ì¤‘ì¸ê°€?
+    private bool isMerging = false;  // í•©ì¹˜ëŠ” ì¤‘ì¸ê°€?
+    private SphereCollider groupingTrigger; // ì£¼ë³€ í•©ì¹˜ê¸° ê°ì§€ íŠ¸ë¦¬ê±°
+    private SphereCollider physicsCollider; // ë¬¼ë¦¬ ì¶©ëŒ ì½œë¼ì´ë”
 
-    // ÃÖÀûÈ­¸¦ À§ÇÑ Å¸ÀÌ¸Ó (¸Å ÇÁ·¹ÀÓ ·¹ÀÌÄ³½ºÆ®¸¦ ½îÁö ¾Ê±â À§ÇÔ)
+    // ë¶€ìœ  ìœ ì§€ ë°”ë‹¥ ì²´í¬ íƒ€ì´ë¨¸(ê³¼ë„í•œ ë¶€ìœ  ë°©ì§€)
     private float groundCheckTimer = 0f;
     private float groundCheckInterval = 0.2f;
 
@@ -43,30 +43,30 @@ public class ItemDrop : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         physicsCollider = GetComponent<SphereCollider>();
 
-        // ÃÊ±â ¹°¸® ¼³Á¤ (¶³¾îÁö´Â »óÅÂ)
+        // ì´ˆê¸° ë¬¼ë¦¬ ì„¤ì •
         rb.isKinematic = false;
         rb.useGravity = true;
-        rb.interpolation = RigidbodyInterpolation.Interpolate; // ºÎµå·¯¿î ¿òÁ÷ÀÓ º¸°£
-        rb.collisionDetectionMode = CollisionDetectionMode.Continuous; // ºü¸¥ ¼Óµµ Åë°ú ¹æÁö
+        rb.interpolation = RigidbodyInterpolation.Interpolate; // ì›€ì§ì„ ë³´ê°„ìœ¼ë¡œ ë¶€ë“œëŸ½ê²Œ
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous; // ê³ ì† ì¶©ëŒ ëˆ„ë½ ë°©ì§€
 
-        // ÇÕÄ¡±â °¨Áö¿ë Æ®¸®°Å »ı¼º (ÄÚµå·Î µ¿Àû Ãß°¡)
+        // ì£¼ë³€ í•©ì¹˜ê¸° íŠ¸ë¦¬ê±° ì¶”ê°€(ì½”ë“œë¡œ ìƒì„±)
         groupingTrigger = gameObject.AddComponent<SphereCollider>();
         groupingTrigger.isTrigger = true;
         groupingTrigger.radius = groupingRadius;
-        groupingTrigger.enabled = false; // ¶³¾îÁö´Â µ¿¾È¿¡´Â ²û (¼º´É Àı¾à)
+        groupingTrigger.enabled = false; // ë‚™í•˜ ì¤‘ì—ëŠ” ë¹„í™œì„±(ì°©ì§€ í›„ í™œì„±í™”)
     }
 
     void Update()
     {
         if (isPickedUp) return;
 
-        // ÂøÁö ÈÄ µÕµÕ ¶ß´Â ¾Ö´Ï¸ŞÀÌ¼Ç Ã³¸®
+        // ì°©ì§€ í›„ ë¶€ìœ  ì—°ì¶œ ì²˜ë¦¬
         if (isFloating)
         {
-            // 1. Á¦ÀÚ¸® È¸Àü
+            // 1. ìƒí–¥ íšŒì „
             transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime);
 
-            // 2. À§¾Æ·¡ µÕµÕ (Sin ±×·¡ÇÁ È°¿ë)
+            // 2. ìƒí•˜ ë°”ìš´ì‹±(Sin ê·¸ë˜í”„ í™œìš©)
             float yBob = ((Mathf.Sin(Time.time * floatSpeed) + 1f) / 2f) * floatHeight;
 
             Vector3 newPos = initialPosition;
@@ -81,26 +81,26 @@ public class ItemDrop : MonoBehaviour
 
         if (isFloating)
         {
-            // µÕµÕ ¶°ÀÖÀ» ¶§µµ °¡²û ¶¥ÀÌ »ç¶óÁ³´ÂÁö È®ÀÎ (ºí·ÏÀÌ ÆÄ±«µÈ °æ¿ì µî)
+            // ë¶€ìœ  ìœ ì§€ ì—¬ë¶€ë¥¼ ì£¼ê¸°ì ìœ¼ë¡œ ê²€ì‚¬(ë°”ë‹¥ì´ ì‚¬ë¼ì§„ ê²½ìš° ë“±)
             groundCheckTimer += Time.fixedDeltaTime;
             if (groundCheckTimer >= groundCheckInterval)
             {
                 groundCheckTimer = 0f;
                 if (!IsGrounded())
                 {
-                    SwitchToFalling(); // ¶¥ ¾øÀ¸¸é ´Ù½Ã ¶³¾îÁü
+                    SwitchToFalling(); // ë°”ë‹¥ì´ ì—†ìœ¼ë©´ ë‹¤ì‹œ ë‚™í•˜
                 }
             }
         }
         else
         {
-            // ¶³¾îÁö´Â Áß: °¡º­¿î ´À³¦À» ¾ø¾Ö±â À§ÇØ Ãß°¡ Áß·Â Àû¿ë
+            // ë‚™í•˜ ì¤‘: ë” ë¹¨ë¦¬ ì•ˆì •ë˜ë„ë¡ ì¶”ê°€ ì¤‘ë ¥ ì ìš©
             if (!rb.isKinematic)
             {
                 rb.AddForce(Vector3.down * extraGravityForce, ForceMode.Acceleration);
             }
 
-            // ÂøÁö È®ÀÎ (¼Óµµ°¡ °ÅÀÇ 0¿¡ °¡±î¿öÁ³À» ¶§)
+            // ì°©ì§€ í™•ì¸(ì†ë„ê°€ ì¶©ë¶„íˆ ë‚®ìœ¼ë©´)
             if (IsGrounded() && rb.velocity.magnitude < 0.5f)
             {
                 SwitchToFloating();
@@ -108,30 +108,30 @@ public class ItemDrop : MonoBehaviour
         }
     }
 
-    // ¶³¾îÁü -> µÕµÕ ¶ß±â·Î ÀüÈ¯
+    // ë‚™í•˜ -> ë¶€ìœ  ì „í™˜
     void SwitchToFloating()
     {
         isFloating = true;
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 
-        rb.isKinematic = true;  // ¹°¸® ²ô±â (Á÷Á¢ ÀÌµ¿)
+        rb.isKinematic = true;  // ë¬¼ë¦¬ ì •ì§€(ê³„ì‚° ì´ë™)
         rb.useGravity = false;
 
-        initialPosition = transform.position; // ÇöÀç À§Ä¡ °íÁ¤
-        groupingTrigger.enabled = true;       // ÁÖº¯ ¾ÆÀÌÅÛ Å½»ö ½ÃÀÛ
+        initialPosition = transform.position; // í˜„ì¬ ìœ„ì¹˜ ì €ì¥
+        groupingTrigger.enabled = true;       // ì£¼ë³€ í•©ì¹˜ê¸° ê°ì§€ í™œì„±í™”
     }
 
-    // µÕµÕ ¶ß±â -> ¶³¾îÁüÀ¸·Î ÀüÈ¯
+    // ë¶€ìœ  -> ë‚™í•˜ ì „í™˜
     void SwitchToFalling()
     {
         isFloating = false;
-        rb.isKinematic = false; // ¹°¸® ÄÑ±â
+        rb.isKinematic = false; // ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ±ï¿½
         rb.useGravity = true;
         groupingTrigger.enabled = false;
     }
 
-    // ¾ÆÀÌÅÛ³¢¸® °ãÄ¡¸é ÇÕÃÄÁö´Â ·ÎÁ÷
+    // ì£¼ë³€ì—ì„œ ë¨¸ë¬´ëŠ” íŠ¸ë¦¬ê±°(í•©ì¹˜ê¸° ê°ì§€)
     private void OnTriggerStay(Collider other)
     {
         if (isMerging || !isFloating || isPickedUp) return;
@@ -140,10 +140,10 @@ public class ItemDrop : MonoBehaviour
         {
             ItemDrop otherItem = other.GetComponent<ItemDrop>();
 
-            // °°Àº Á¾·ùÀÌ°í ¾ÆÁ÷ È¹µæµÇÁö ¾ÊÀº ¾ÆÀÌÅÛÀÎ°¡?
+            // ê°™ì€ ì¢…ë¥˜, ì•„ì§ ë¯¸ìˆ˜ê±°, ìì‹  ì•„ë‹˜ì¸ì§€ í™•ì¸
             if (otherItem != null && !otherItem.isPickedUp && otherItem != this && otherItem.type == this.type)
             {
-                // µÎ ¾ÆÀÌÅÛ Áß ID°¡ Å« ÂÊÀ¸·Î ¸ô¾ÆÁÖ±â (¾çÂÊ ´Ù »èÁ¦µÇ´Â °Í ¹æÁö)
+                // InstanceIDê°€ í° ìª½ì„ ê¸°ì¤€ìœ¼ë¡œ í•©ì¹˜ê¸°(ì¶©ëŒ ì¤‘ë³µ ë°©ì§€)
                 if (otherItem.GetInstanceID() > this.GetInstanceID())
                 {
                     MergeInto(otherItem);
@@ -155,8 +155,8 @@ public class ItemDrop : MonoBehaviour
     void MergeInto(ItemDrop otherItem)
     {
         isMerging = true;
-        otherItem.Combine(this.count); // °³¼ö ³Ñ°ÜÁÖ±â
-        Destroy(this.gameObject);      // ³ª´Â »ç¶óÁü
+        otherItem.Combine(this.count); // ìˆ˜ëŸ‰ ì´ë™
+        Destroy(this.gameObject);      // ìì‹  ì˜¤ë¸Œì íŠ¸ ì œê±°
     }
 
     public void Combine(int amount)
@@ -164,17 +164,17 @@ public class ItemDrop : MonoBehaviour
         this.count += amount;
     }
 
-    // ¹Ù´Ú °¨Áö (Raycast)
+    // ë°”ë‹¥ ê²€ì‚¬(Raycast)
     private bool IsGrounded()
     {
         float radius = physicsCollider != null ? physicsCollider.radius : 0.25f;
         float checkDist = 0.2f;
 
-        // ¶° ÀÖÀ» ¶§´Â ·¹ÀÌÀú¸¦ ´õ ±æ°Ô ½÷¼­ ´úÄÈ°Å¸² ¹æÁö
+        // ë¶€ìœ  ë†’ì´ë¥¼ ê³ ë ¤í•´ ê²€ì‚¬ ê±°ë¦¬ ë³´ì •
         if (isFloating) checkDist += baseFloatHeight + floatHeight + 0.1f;
 
         RaycastHit hit;
-        // ¾Æ·¡ÂÊÀ¸·Î ·¹ÀÌÀú¸¦ ¹ß»çÇØ Block ÅÂ±×¸¦ °¡Áø ¹°Ã¼°¡ ÀÖ´ÂÁö È®ÀÎ
+        // ì•„ë˜ë¡œ ë ˆì´ìºìŠ¤íŠ¸ í›„ Block íƒœê·¸ í™•ì¸
         if (Physics.Raycast(transform.position, Vector3.down, out hit, radius + checkDist))
         {
             if (hit.collider.CompareTag("Block")) return true;

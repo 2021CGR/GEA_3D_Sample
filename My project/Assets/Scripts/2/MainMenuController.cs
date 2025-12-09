@@ -4,46 +4,46 @@ using UnityEngine;
 using UnityEngine.SceneManagement; 
 
 /// <summary>
-/// ¸ÞÀÎ ¸Þ´º(Å¸ÀÌÆ² È­¸é)ÀÇ ¹öÆ° ±â´ÉÀ» °ü¸®ÇÏ´Â ½ºÅ©¸³Æ®ÀÔ´Ï´Ù.
-/// ½ÃÀÛ ¹öÆ°: °ÔÀÓ ¾À ·Îµå
-/// Á¾·á ¹öÆ°: °ÔÀÓ Á¾·á
+/// ë©”ì¸ ë©”ë‰´(íƒ€ì´í‹€ í™”ë©´)ì˜ ë²„íŠ¼ ë™ìž‘ì„ ê´€ë¦¬í•©ë‹ˆë‹¤.
+/// ì‹œìž‘ ë²„íŠ¼: ê²Œìž„ ì”¬ ë¡œë“œ
+/// ì¢…ë£Œ ë²„íŠ¼: ì• í”Œë¦¬ì¼€ì´ì…˜ ì¢…ë£Œ
 /// </summary>
 public class MainMenuController : MonoBehaviour
 {
-    [Header("¼³Á¤")]
-    // ÀÌµ¿ÇÒ °ÔÀÓ ÇÃ·¹ÀÌ ¾ÀÀÇ ÀÌ¸§À» Á¤È®È÷ Àû¾î¾ß ÇÕ´Ï´Ù.
-    // (¿¹: "SampleScene", "GameScene" µî)
+    [Header("ì„¤ì •")]
+    // ë¡œë“œí•  ê²Œìž„ ì”¬ ì´ë¦„ì„ ì§€ì •í•©ë‹ˆë‹¤.
+    // ì˜ˆ: "SampleScene", "GameScene" ë“±
     public string gameSceneName = "Map1";
 
     void Start()
     {
-        // [Áß¿ä] ¸ÞÀÎ ¸Þ´º¿¡ µé¾î¿À¸é ¸¶¿ì½º Ä¿¼­¸¦ º¸ÀÌ°Ô ÇÏ°í Àá±ÝÀ» ÇØÁ¦ÇÕ´Ï´Ù.
-        // (°ÔÀÓ ÇÃ·¹ÀÌ Áß¿¡´Â Ä¿¼­°¡ Àá°ÜÀÖÀ¸¹Ç·Î, ¸Þ´º·Î µ¹¾Æ¿ÔÀ» ¶§ Ç®¾îÁà¾ß ÇÔ)
+        // [ì£¼ì˜] ë©”ë‰´ í™”ë©´ì—ì„œëŠ” ì»¤ì„œë¥¼ ë³´ì´ê²Œ í•˜ê³  ìž ê¸ˆ í•´ì œí•©ë‹ˆë‹¤.
+        // (ê²Œìž„ ì¤‘ì—ëŠ” ì»¤ì„œê°€ ìž ê¸°ë¯€ë¡œ, ë©”ë‰´ì—ì„œëŠ” í•´ì œí•´ì•¼ ì¡°ìž‘ì´ ê°€ëŠ¥í•©ë‹ˆë‹¤)
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
     /// <summary>
-    /// '°ÔÀÓ ½ÃÀÛ' ¹öÆ°À» ´­·¶À» ¶§ È£ÃâÇÒ ÇÔ¼ö
+    /// 'ê²Œìž„ ì‹œìž‘' ë²„íŠ¼ì„ ëˆŒë €ì„ ë•Œ í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
     /// </summary>
     public void OnStartButtonClick()
     {
-        // ÁöÁ¤µÈ ÀÌ¸§ÀÇ ¾ÀÀ» ·ÎµåÇÕ´Ï´Ù.
-        // ÁÖÀÇ: File -> Build Settings¿¡ ÇØ´ç ¾ÀÀÌ µî·ÏµÇ¾î ÀÖ¾î¾ß ÇÕ´Ï´Ù.
+        // ì„¤ì •ëœ ì”¬ ì´ë¦„ì„ ë¡œë“œí•©ë‹ˆë‹¤.
+        // ì£¼ì˜: File -> Build Settingsì— í•´ë‹¹ ì”¬ì´ í¬í•¨ë˜ì–´ ìžˆì–´ì•¼ í•©ë‹ˆë‹¤.
         SceneManager.LoadScene(gameSceneName);
     }
 
     /// <summary>
-    /// '°ÔÀÓ Á¾·á' ¹öÆ°À» ´­·¶À» ¶§ È£ÃâÇÒ ÇÔ¼ö
+    /// 'ê²Œìž„ ì¢…ë£Œ' ë²„íŠ¼ì„ ëˆŒë €ì„ ë•Œ í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
     /// </summary>
     public void OnQuitButtonClick()
     {
-        // ¿¡µðÅÍ¿¡¼­´Â °ÔÀÓ Á¾·á°¡ µÇÁö ¾ÊÀ¸¹Ç·Î ·Î±×¸¦ ¶ç¿ö È®ÀÎÇÕ´Ï´Ù.
+        // ì—ë””í„°ì—ì„œëŠ” ì¦‰ì‹œ ì¢…ë£Œê°€ ë˜ì§€ ì•Šìœ¼ë¯€ë¡œ ë¡œê·¸ë¡œ í™•ì¸í•©ë‹ˆë‹¤.
 #if UNITY_EDITOR
-        Debug.Log("°ÔÀÓ Á¾·á (¿¡µðÅÍ »óÅÂ¶ó Á¾·áµÇÁö ¾Ê½À´Ï´Ù.)");
-        UnityEditor.EditorApplication.isPlaying = false; // ¿¡µðÅÍ ÇÃ·¹ÀÌ ÁßÁö
+        Debug.Log("ì—ë””í„°ì—ì„œ ì¢…ë£Œ ìš”ì²­(í”Œë ˆì´ ëª¨ë“œ ì¢…ë£Œ)");
+        UnityEditor.EditorApplication.isPlaying = false; // ì—ë””í„° í”Œë ˆì´ ì¢…ë£Œ
 #else
-            // ½ÇÁ¦ ºôµåµÈ °ÔÀÓÀ» Á¾·áÇÕ´Ï´Ù.
+            // ë¹Œë“œëœ ì• í”Œë¦¬ì¼€ì´ì…˜ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.
             Application.Quit(); 
 #endif
     }

@@ -20,7 +20,7 @@ public class PauseMenuController : MonoBehaviour
     public void Resume()
     {
         pauseMenuUI.SetActive(false);
-        Time.timeScale = 1f; // ½Ã°£ ´Ù½Ã Èå¸£°Ô
+        Time.timeScale = 1f; // ì‹œê°„ ë‹¤ì‹œ íë¥´ê²Œ
         GameIsPaused = false;
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -31,7 +31,7 @@ public class PauseMenuController : MonoBehaviour
     void Pause()
     {
         pauseMenuUI.SetActive(true);
-        Time.timeScale = 0f; // ½Ã°£ Á¤Áö
+        Time.timeScale = 0f; // ì‹œê°„ ì •ì§€
         GameIsPaused = true;
 
         Cursor.lockState = CursorLockMode.None;
@@ -42,7 +42,7 @@ public class PauseMenuController : MonoBehaviour
     void ToggleCrosshair(bool isVisible)
     {
         if (crosshairObject == null) crosshairObject = GameObject.Find("CrosshairUI");
-        if (crosshairObject != null) crosshairObject.SetActive(isVisible);
+        if (crosshairObject != null) crosshairObject.SetActive(isVisible); // í¬ë¡œìŠ¤í—¤ì–´ í‘œì‹œ/ìˆ¨ê¹€
     }
 
     public void LoadMenu()

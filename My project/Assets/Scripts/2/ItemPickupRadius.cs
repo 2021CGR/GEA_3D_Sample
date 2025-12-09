@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// ÇÃ·¹ÀÌ¾î ÁÖº¯ÀÇ ¾ÆÀÌÅÛÀ» °¨ÁöÇÏ¿© ÀÎº¥Åä¸®¿¡ ³Ö½À´Ï´Ù.
-/// ÇÃ·¹ÀÌ¾î ¿ÀºêÁ§Æ®ÀÇ ÀÚ½ÄÀ¸·Î ÀÖ°í, Trigger Collider°¡ ÀÖ¾î¾ß ÇÕ´Ï´Ù.
+/// í”Œë ˆì´ì–´ ì£¼ë³€ì˜ ì•„ì´í…œì„ ìë™ìœ¼ë¡œ ìˆ˜ê±°í•˜ì—¬ ì¸ë²¤í† ë¦¬ì— ì¶”ê°€í•©ë‹ˆë‹¤.
+/// í”Œë ˆì´ì–´ ì˜¤ë¸Œì íŠ¸ì˜ ìì‹ìœ¼ë¡œ ë‘ê³ , íŠ¸ë¦¬ê±° ì½œë¼ì´ë”ë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.
 /// </summary>
 [RequireComponent(typeof(SphereCollider))]
 [RequireComponent(typeof(Rigidbody))]
@@ -12,20 +12,20 @@ public class ItemPickupRadius : MonoBehaviour
 
     void Start()
     {
-        // ºÎ¸ğ ¿ÀºêÁ§Æ®(ÇÃ·¹ÀÌ¾î)¿¡¼­ ÀÎº¥Åä¸® ½ºÅ©¸³Æ®¸¦ Ã£½À´Ï´Ù.
+        // ë¶€ëª¨ ì˜¤ë¸Œì íŠ¸(í”Œë ˆì´ì–´)ì—ì„œ ì¸ë²¤í† ë¦¬ ìŠ¤í¬ë¦½íŠ¸ë¥¼ ì°¾ìŠµë‹ˆë‹¤.
         inventory = GetComponentInParent<Inventory>();
 
-        // Ãæµ¹ °¨Áö¿ë Æ®¸®°Å ¼³Á¤ °­Á¦
+        // íŠ¸ë¦¬ê±° ì½œë¼ì´ë” ì„¤ì •
         SphereCollider sc = GetComponent<SphereCollider>();
         if (!sc.isTrigger) sc.isTrigger = true;
 
-        // ÀÌ ¿ÀºêÁ§Æ® ÀÚÃ¼´Â ¹°¸® ÈûÀ» ¹ŞÁö ¾Êµµ·Ï ¼³Á¤
+        // ë¬¼ë¦¬ ì˜í–¥ì´ ì—†ë„ë¡ ë¦¬ì§€ë“œë°”ë”” ì„¤ì •
         Rigidbody rb = GetComponent<Rigidbody>();
         rb.isKinematic = true;
         rb.useGravity = false;
     }
 
-    // ¾ÆÀÌÅÛÀÌ ¹üÀ§ ³»¿¡ µé¾î¿ÔÀ» ¶§
+    // íŠ¸ë¦¬ê±°ì— ì§„ì…í–ˆì„ ë•Œ
     private void OnTriggerEnter(Collider other)
     {
         if (inventory == null) return;
@@ -35,13 +35,13 @@ public class ItemPickupRadius : MonoBehaviour
             ItemDrop item = other.GetComponent<ItemDrop>();
             if (item != null)
             {
-                // [Áß¿ä] ÀÌ¹Ì ´©±º°¡ ÁÖ¿î ¾ÆÀÌÅÛÀÌ¸é ¹«½Ã (ÀÌÁß È¹µæ ¹æÁö)
+                // [ì¤‘ë³µ ë°©ì§€] ì´ë¯¸ ìˆ˜ê±°ëœ ì•„ì´í…œì´ë©´ ë¬´ì‹œ
                 if (item.isPickedUp) return;
 
-                // È¹µæ Ã³¸®
-                item.isPickedUp = true; // ÇÃ·¡±× ¼¼¿ò
-                inventory.Add(item.type, item.count); // ÀÎº¥Åä¸®¿¡ Ãß°¡
-                Destroy(other.gameObject); // ¿ùµå¿¡¼­ »èÁ¦
+                // ìˆ˜ê±° ì²˜ë¦¬
+                item.isPickedUp = true;             // í”½ì—… í‘œì‹œ
+                inventory.Add(item.type, item.count); // ì¸ë²¤í† ë¦¬ì— ì¶”ê°€
+                Destroy(other.gameObject);           // ì˜¤ë¸Œì íŠ¸ ì œê±°
             }
         }
     }

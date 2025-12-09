@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 /// 플레이어의 물리적 이동(걷기, 점프)과 1인칭 시점 제어,
 /// 그리고 마우스 커서의 잠금/해제 상태를 관리하는 핵심 컨트롤러입니다.
 /// </summary>
+[RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
     [Header("이동 설정")]

@@ -3,51 +3,52 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq;
 
 /// <summary>
-/// ÀÎº¥Åä¸® µ¥ÀÌÅÍ¸¦ ½Ã°¢È­ÇÏ°í, ÇöÀç ¼±ÅÃµÈ ½½·ÔÀÇ »ö»óÀ» º¯°æÇÏ´Â UI ½ºÅ©¸³Æ®ÀÔ´Ï´Ù.
+/// ì¸ë²¤í† ë¦¬ ë°ì´í„°ë¥¼ ì‹œê°í™”í•˜ê³ , í˜„ì¬ ì„ íƒëœ ìŠ¬ë¡¯ ê°•ì¡°ë¥¼ ì²˜ë¦¬í•˜ëŠ” UI ìŠ¤í¬ë¦½íŠ¸ì…ë‹ˆë‹¤.
 /// </summary>
 public class InventoryUI : MonoBehaviour
 {
-    [Header("¿¬°á ÇÊ¼ö")]
-    public Inventory inventory;       // µ¥ÀÌÅÍ ¼Ò½º (ÇÃ·¹ÀÌ¾î ÀÎº¥Åä¸®)
-    public Transform slotContainer;   // ½½·ÔµéÀÌ »ı¼ºµÉ ºÎ¸ğ ÆĞ³Î (Content µî)
-    public GameObject slotPrefab;     // ½½·Ô ÇÁ¸®ÆÕ (Icon, CountText Æ÷ÇÔ)
+    [Header("ì°¸ì¡° í•„ìˆ˜")]
+    public Inventory inventory;       // ë°ì´í„° ì†ŒìŠ¤(í”Œë ˆì´ì–´ ì¸ë²¤í† ë¦¬)
+    public Transform slotContainer;   // ìŠ¬ë¡¯ë“¤ì„ ë‹´ëŠ” ë¶€ëª¨ ì˜¤ë¸Œì íŠ¸(Content ë“±)
+    public GameObject slotPrefab;     // ìŠ¬ë¡¯ í”„ë¦¬íŒ¹(ì•„ì´ì½˜, ê°œìˆ˜ í…ìŠ¤íŠ¸ í¬í•¨)
 
-    [Header("¾ÆÀÌÄÜ ¸®¼Ò½º")]
+    [Header("ì•„ì´ì½˜ ë¦¬ì†ŒìŠ¤")]
     public Sprite dirtIcon;
     public Sprite grassIcon;
     public Sprite waterIcon;
     public Sprite ironIcon;
     public Sprite diamondIcon;
 
-    [Header("¼±ÅÃ °­Á¶ ¼³Á¤")]
-    public Color selectedColor = Color.red;   // ¼±ÅÃ ½Ã ¹è°æ»ö
-    public Color normalColor = Color.white;   // Æò»ó½Ã ¹è°æ»ö
+    [Header("ì„ íƒ ê°•ì¡° ìƒ‰ìƒ")]
+    public Color selectedColor = Color.red;   // ì„ íƒëœ ìŠ¬ë¡¯ ìƒ‰ìƒ
+    public Color normalColor = Color.white;   // ê¸°ë³¸ ìŠ¬ë¡¯ ìƒ‰ìƒ
 
-    // »ı¼ºµÈ ½½·Ô ¿ÀºêÁ§Æ®µéÀ» °ü¸®ÇÏ´Â ¸®½ºÆ®
+    // ìƒì„±ëœ ìŠ¬ë¡¯ ì˜¤ë¸Œì íŠ¸ë¥¼ ì¶”ì í•˜ê¸° ìœ„í•œ ë¦¬ìŠ¤íŠ¸
     private List<GameObject> activeSlots = new List<GameObject>();
-    // ºí·Ï Å¸ÀÔº° ¾ÆÀÌÄÜÀ» Ã£±â À§ÇÑ µñ¼Å³Ê¸®
+    // ë¸”ë¡ íƒ€ì…ê³¼ ì•„ì´ì½˜ì„ ë§¤í•‘í•˜ê¸° ìœ„í•œ ë”•ì…”ë„ˆë¦¬
     private Dictionary<BlockType, Sprite> iconMap = new Dictionary<BlockType, Sprite>();
 
-    // ÇöÀç ¼±ÅÃµÈ ½½·Ô ¹øÈ£
+    // í˜„ì¬ ì„ íƒëœ ìŠ¬ë¡¯ ì¸ë±ìŠ¤
     private int currentSelectedIndex = -1;
 
     void Start()
     {
         InitializeIconMap();
 
-        // ÀÎº¥Åä¸® º¯°æ ÀÌº¥Æ® ±¸µ¶ (µ¥ÀÌÅÍ°¡ º¯ÇÏ¸é UpdateUI ÀÚµ¿ ½ÇÇà)
+        // ì¸ë²¤í† ë¦¬ ë³€ê²½ ì´ë²¤íŠ¸ êµ¬ë…(ë°ì´í„°ê°€ ë°”ë€Œë©´ UI ê°±ì‹ )
         if (inventory != null)
         {
             inventory.OnInventoryChanged += UpdateUI;
         }
-        UpdateUI(); // ÃÊ±âÈ­ ½Ã ÇÑ¹ø ±×¸®±â
+        UpdateUI(); // ì´ˆê¸°í™” í›„ í•œ ë²ˆ ê°±ì‹ 
     }
 
     void OnDestroy()
     {
-        // ÀÌº¥Æ® ±¸µ¶ ÇØÁ¦ (¸Ş¸ğ¸® ´©¼ö ¹æÁö, ÇÊ¼ö!)
+        // ì´ë²¤íŠ¸ êµ¬ë… í•´ì œ(ë©”ëª¨ë¦¬ ëˆ„ìˆ˜ ë°©ì§€, í•„ìˆ˜)
         if (inventory != null)
         {
             inventory.OnInventoryChanged -= UpdateUI;
@@ -64,50 +65,54 @@ public class InventoryUI : MonoBehaviour
     }
 
     /// <summary>
-    /// ¸ğµç ½½·ÔÀ» Áö¿ì°í ´Ù½Ã ±×¸®´Â ÇÔ¼ö (´Ü¼øÇÑ ¹æ½Ä)
+    /// í˜„ì¬ ì¸ë²¤í† ë¦¬ ë‚´ìš©ìœ¼ë¡œ ìŠ¬ë¡¯ UIë¥¼ ë‹¤ì‹œ ê·¸ë¦½ë‹ˆë‹¤.
     /// </summary>
     public void UpdateUI()
     {
-        // 1. ±âÁ¸ ½½·Ô ¸ğµÎ »èÁ¦
+        if (inventory == null || slotContainer == null || slotPrefab == null) return;
+        // 1. ê¸°ì¡´ ìŠ¬ë¡¯ ëª¨ë‘ ì œê±°
         foreach (GameObject slot in activeSlots)
         {
             Destroy(slot);
         }
         activeSlots.Clear();
 
-        // 2. ÀÎº¥Åä¸®¸¦ ¼øÈ¸ÇÏ¸ç ½½·Ô »õ·Î »ı¼º
-        foreach (var item in inventory.items)
+        // 2. ì¸ë²¤í† ë¦¬ë¥¼ ìˆœíšŒí•˜ë©° ìŠ¬ë¡¯ ìƒì„±
+        foreach (var item in inventory.items.OrderBy(kvp => kvp.Key))
         {
             BlockType type = item.Key;
             int count = item.Value;
 
-            if (count <= 0) continue; // 0°³¸é Ç¥½Ã ¾È ÇÔ
+            if (count <= 0) continue; // ìˆ˜ëŸ‰ 0ì´ë©´ í‘œì‹œí•˜ì§€ ì•ŠìŒ
 
             GameObject newSlot = Instantiate(slotPrefab, slotContainer);
 
-            // ÀÚ½Ä ÄÄÆ÷³ÍÆ® Ã£±â (ÀÌ¸§À¸·Î Ã£±â)
+            // ìì‹ ì»´í¬ë„ŒíŠ¸ ì°¾ê¸°(ì´ë¦„ ê¸°ì¤€)
             Image iconImage = newSlot.transform.Find("Icon").GetComponent<Image>();
             TextMeshProUGUI countText = newSlot.transform.Find("CountText").GetComponent<TextMeshProUGUI>();
 
-            // µ¥ÀÌÅÍ Àû¿ë
+            // ì•„ì´ì½˜/ìˆ˜ëŸ‰ ì ìš©
             iconImage.sprite = GetIcon(type);
             countText.text = count.ToString();
+
+            var uiItem = newSlot.GetComponent<UIItem>() ?? newSlot.AddComponent<UIItem>();
+            uiItem.Initialize(type, count, iconImage.sprite);
 
             activeSlots.Add(newSlot);
         }
 
-        // 3. Àç»ı¼º ÈÄ ¼±ÅÃ »óÅÂ ´Ù½Ã Àû¿ë (½½·ÔÀÌ ¹Ù²î¾úÀ¸¹Ç·Î »ö»ó ´Ù½Ã Ä¥ÇÏ±â)
+        // 3. ì„ íƒ ê°•ì¡° ìƒíƒœ ê°±ì‹ (ìˆœì„œ ë³€ê²½ ì‹œ ë‹¤ì‹œ ë°˜ì˜)
         RefreshSelectionVisual();
     }
 
-    Sprite GetIcon(BlockType type)
+    public Sprite GetIcon(BlockType type)
     {
         if (iconMap.TryGetValue(type, out Sprite icon)) return icon;
         return null;
     }
 
     /// <summary>
-    /// ¿ÜºÎ(ÀÔ·Â ½Ã½ºÅÛ)¿¡¼­ "N¹øÂ° ½½·Ô ¼±ÅÃÇØÁà"¶ó°í ¿äÃ»ÇÏ´Â ÇÔ¼ö
+    /// ì™¸ë¶€(ì…ë ¥ ì‹œìŠ¤í…œ)ì—ì„œ Në²ˆì§¸ ìŠ¬ë¡¯ì„ ì„ íƒí•˜ë„ë¡ ìš”ì²­í•©ë‹ˆë‹¤.
     /// </summary>
     public void SelectSlot(int index)
     {
@@ -116,7 +121,7 @@ public class InventoryUI : MonoBehaviour
     }
 
     /// <summary>
-    /// ½ÇÁ¦ ¹è°æ»öÀ» º¯°æÇÏ¿© ¼±ÅÃµÊÀ» Ç¥½ÃÇÏ´Â ÇÔ¼ö
+    /// ì„ íƒ ìƒíƒœë¥¼ ë°˜ì˜í•´ ë°°ê²½ìƒ‰ì„ ê°±ì‹ í•©ë‹ˆë‹¤.
     /// </summary>
     void RefreshSelectionVisual()
     {
@@ -125,7 +130,7 @@ public class InventoryUI : MonoBehaviour
             Image bgImage = activeSlots[i].GetComponent<Image>();
             if (bgImage != null)
             {
-                // ÀÎµ¦½º°¡ ÀÏÄ¡ÇÏ¸é °­Á¶»ö, ¾Æ´Ï¸é ÀÏ¹İ»ö
+                // ì„ íƒëœ ì¸ë±ìŠ¤ë©´ ì„ íƒìƒ‰, ì•„ë‹ˆë©´ ê¸°ë³¸ìƒ‰
                 bgImage.color = (i == currentSelectedIndex) ? selectedColor : normalColor;
             }
         }
