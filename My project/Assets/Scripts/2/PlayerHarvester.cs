@@ -3,7 +3,11 @@ using UnityEngine;
 using UnityEngine.EventSystems; // UI 위 클릭 방지용
 
 /// <summary>
-/// 플레이어의 채광, 건축, 아이템 선택을 담당하는 통합 컨트롤러입니다.
+/// 채광/건축/슬롯 선택을 담당하는 통합 컨트롤러.
+/// - 카메라 중앙에서 레이캐스트하여 블록을 채광(Hit)
+/// - 선택된 블록 프리팹을 월드에 설치(건축)
+/// - 인벤토리 변경을 구독하여 슬롯 목록을 갱신하고 선택을 유지
+/// - 무기/도구(검/도끼/곡괭이)에 따라 데미지를 가변 적용
 /// </summary>
 public class PlayerHarvester : MonoBehaviour
 {
@@ -33,6 +37,10 @@ public class PlayerHarvester : MonoBehaviour
 
     [Tooltip("철검(IronSword) 착용 시 데미지")]
     public int swordDamage = 5;
+    [Tooltip("도끼(Axe) 착용 시 데미지")]
+    public int axeDamage = 3;
+    [Tooltip("곡괭이(Pickax) 착용 시 데미지")]
+    public int pickaxDamage = 4;
 
     [Tooltip("공격/건축 쿨다운 (광클 방지)")]
     public float hitCooldown = 0.15f;
@@ -45,6 +53,7 @@ public class PlayerHarvester : MonoBehaviour
     private float _nextHitTime;
     private Camera _cam;
     private Inventory inventory;
+    private PlayerAnimation anim;
 
     // 현재 보유 중인 아이템 리스트 (1~9번 키 매핑용)
     private List<BlockType> availableBlocks = new List<BlockType>();
@@ -59,6 +68,7 @@ public class PlayerHarvester : MonoBehaviour
     void Awake()
     {
         _cam = GetComponentInChildren<Camera>();
+        anim = GetComponentInChildren<PlayerAnimation>();
 
         // 인벤토리 컴포넌트 가져오기 또는 추가
         inventory = GetComponent<Inventory>();
@@ -81,6 +91,12 @@ public class PlayerHarvester : MonoBehaviour
 
     #region [3. 입력 처리 및 업데이트]
 
+    /// <summary>
+    /// 입력 프레임 처리:
+    /// - UI 모드이거나 포인터가 UI 위면 조작 중단
+    /// - 좌클릭: 쿨다운 기준으로 채광 시도
+    /// - 우클릭: 현재 선택 아이템으로 건축 시도
+    /// </summary>
     void Update()
     {
         // UI 모드이거나 마우스가 UI 버튼 위에 있으면 작동 중지
@@ -103,7 +119,9 @@ public class PlayerHarvester : MonoBehaviour
         }
     }
 
-    // 숫자키 입력 처리 (1~9, 0)
+    /// <summary>
+    /// 숫자키(1~9,0)로 슬롯 선택 처리
+    /// </summary>
     void HandleInput()
     {
         for (int i = 0; i < 9; i++)
@@ -113,12 +131,15 @@ public class PlayerHarvester : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha0)) SelectSlot(9);
     }
 
-    // 특정 슬롯 선택
+    /// <summary>
+    /// 특정 슬롯 선택 및 UI 반영
+    /// </summary>
     void SelectSlot(int index)
     {
         if (index >= availableBlocks.Count) return;
 
         currentSelectedBlock = availableBlocks[index];
+        if (anim != null) anim.SetTool(currentSelectedBlock);
 
         // UI 갱신 요청
         if (inventoryUI != null) inventoryUI.SelectSlot(index);
@@ -127,8 +148,8 @@ public class PlayerHarvester : MonoBehaviour
     }
 
     /// <summary>
-    /// [핵심 수정] 인벤토리가 변할 때 목록을 갱신합니다.
-    /// 아이템이 추가되어 슬롯 번호가 밀려도, 들고 있던 아이템을 계속 잡고 있도록 처리합니다.
+    /// 인벤토리 변경 시 보유 가능한 블록 목록을 정렬/재구성하고
+    /// 이전에 들고 있던 아이템을 가능한 경우 동일 항목으로 재선택한다.
     /// </summary>
     void RefreshAvailableBlocks()
     {
@@ -169,7 +190,11 @@ public class PlayerHarvester : MonoBehaviour
 
     #region [4. 채광 및 건축 로직]
 
-    // 채광 (블록 파괴)
+    /// <summary>
+    /// 채광(블록 타격) 처리:
+    /// - 카메라 중앙에서 레이캐스트
+    /// - 선택된 무기/도구에 따라 데미지 계산 후 Block.Hit 호출
+    /// </summary>
     void TryMine()
     {
         Ray ray = _cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
@@ -179,26 +204,44 @@ public class PlayerHarvester : MonoBehaviour
             var block = hit.collider.GetComponent<Block>();
             if (block != null)
             {
-                // [데미지 로직] 철검이면 5, 아니면 1
+                // [데미지 로직] 도구/무기 선택에 따라 가변
                 int currentDamage = baseDamage;
                 if (currentSelectedBlock == BlockType.IronSword)
                 {
                     currentDamage = swordDamage;
                     Debug.Log("⚔️ 철검 공격! (데미지: " + currentDamage + ")");
                 }
+                else if (currentSelectedBlock == BlockType.Axe)
+                {
+                    currentDamage = axeDamage;
+                    Debug.Log("🪓 도끼 공격! (데미지: " + currentDamage + ")");
+                }
+                else if (currentSelectedBlock == BlockType.Pickax)
+                {
+                    currentDamage = pickaxDamage;
+                    Debug.Log("⛏️ 곡괭이 공격! (데미지: " + currentDamage + ")");
+                }
 
+                if (anim != null) anim.TriggerAttack();
                 block.Hit(currentDamage, inventory);
             }
         }
     }
 
-    // 건축 (블록 설치)
+    /// <summary>
+    /// 건축(블록 설치):
+    /// - 무기/도구면 설치 불가
+    /// - 설치 지점은 히트 지점 + 법선 방향 보정 후 격자 반올림
+    /// - 플레이어 위치/머리 위는 설치 금지(환불)
+    /// </summary>
     void TryBuild()
     {
         if (currentSelectedBlock == null) return;
 
-        // [예외] 철검은 설치할 수 없음
-        if (currentSelectedBlock == BlockType.IronSword)
+        // [예외] 도구/무기는 설치할 수 없음
+        if (currentSelectedBlock == BlockType.IronSword
+            || currentSelectedBlock == BlockType.Axe
+            || currentSelectedBlock == BlockType.Pickax)
         {
             Debug.Log("🚫 무기는 설치할 수 없습니다.");
             return;
@@ -227,6 +270,7 @@ public class PlayerHarvester : MonoBehaviour
             }
 
             Instantiate(prefabToSpawn, finalPos, Quaternion.identity);
+            if (anim != null) anim.TriggerBuild();
         }
         else
         {

@@ -4,19 +4,30 @@ using UnityEngine;
 using System;
 
 /// <summary>
-/// 아이템 데이터를 딕셔너리로 관리하며, 변경 사항이 있을 때 이벤트를 발생시킵니다.
-/// UI는 이 이벤트를 구독하여 화면을 갱신합니다.
+/// 간단한 인벤토리 데이터 저장소.
+/// - Key: <see cref="BlockType"/> / Value: 보유 개수
+/// - 변경(Add/Consume) 시 <see cref="OnInventoryChanged"/> 이벤트를 발행하여
+///   UI가 즉시 갱신되도록 한다.
 /// </summary>
 public class Inventory : MonoBehaviour
 {
-    // 인벤토리가 변경(추가/삭제)될 때 UI 등에게 알리는 이벤트 (델리게이트)
+    // 인벤토리가 변경(추가/삭제)될 때 UI 등에 알리는 이벤트
     public event Action OnInventoryChanged;
 
     // 아이템 저장소 (Key: 블록타입, Value: 개수)
     public Dictionary<BlockType, int> items = new();
 
     /// <summary>
-    /// 아이템 획득 함수
+    /// 특정 아이템의 현재 보유 개수 조회
+    /// </summary>
+    public int GetCount(BlockType id)
+    {
+        items.TryGetValue(id, out var count);
+        return count;
+    }
+
+    /// <summary>
+    /// 아이템 획득(보유량 증가) 및 변경 이벤트 발행
     /// </summary>
     public void Add(BlockType type, int count = 1)
     {
@@ -34,7 +45,7 @@ public class Inventory : MonoBehaviour
     }
 
     /// <summary>
-    /// 아이템 소모 함수 (건축 등)
+    /// 아이템 소모(보유량 감소). 건축/재료 투입 등에서 사용
     /// </summary>
     /// <returns>성공하면 true, 부족하면 false 반환</returns>
     public bool Consume(BlockType type, int count = 1)
