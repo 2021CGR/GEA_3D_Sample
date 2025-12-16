@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ae8b602c367d53d4793932afb9d4ed88, type: 2}
+  - {fileID: 2100000, guid: e4511984de7505541a3d6281fb84c9b0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -120,8 +120,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 1
   maxHp: 3
-  hp: 0
   dropCount: 1
   mineable: 1
-  itemDropPrefab: {fileID: 2875559718919423900, guid: fd1aa8f077f090343a98d6d5c86955e0,
-    type: 3}
+  hp: 0

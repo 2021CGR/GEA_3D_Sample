@@ -16,6 +16,7 @@ public class PlayerAnimation : MonoBehaviour
     public float headTurnScale = 0.5f;
     float _headTurnCurrent = 0f;
     bool _jumpIsTrigger = true;
+    public bool walkOnly = true;
 
     void Awake()
     {
@@ -48,6 +49,7 @@ public class PlayerAnimation : MonoBehaviour
     public void TriggerJump()
     {
         if (animator == null) return;
+        if (walkOnly) return;
         if (_jumpIsTrigger)
         {
             animator.SetTrigger(jumpTrigger);
@@ -69,18 +71,21 @@ public class PlayerAnimation : MonoBehaviour
     public void TriggerAttack()
     {
         if (animator == null) return;
+        if (walkOnly) return;
         animator.SetTrigger(attackTrigger);
     }
 
     public void TriggerBuild()
     {
         if (animator == null) return;
+        if (walkOnly) return;
         animator.SetTrigger(buildTrigger);
     }
 
     public void SetTool(BlockType? tool)
     {
         if (animator == null) return;
+        if (walkOnly) return;
         int t = 0;
         if (tool.HasValue)
         {
@@ -101,11 +106,8 @@ public class PlayerAnimation : MonoBehaviour
         int moveState = 0;
         if (Mathf.Abs(h) > 0.01f || Mathf.Abs(v) > 0.01f)
         {
-            moveState = run && v > 0f ? 2 : 1;
-            if (Mathf.Abs(v) > 0.01f)
-            {
-                animator.SetFloat(speedParam, v > 0f ? 1f : -1f);
-            }
+            moveState = 1;
+            animator.SetFloat(speedParam, v >= 0f ? 1f : -1f);
         }
         else
         {
@@ -117,6 +119,11 @@ public class PlayerAnimation : MonoBehaviour
     public void SetHeadTurn(float mouseXDelta)
     {
         if (animator == null) return;
+        if (walkOnly)
+        {
+            animator.SetInteger(headTurnParam, 0);
+            return;
+        }
         int dir = 0;
         if (mouseXDelta < -0.15f) dir = 1;
         else if (mouseXDelta > 0.15f) dir = 2;

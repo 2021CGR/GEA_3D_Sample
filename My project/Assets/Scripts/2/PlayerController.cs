@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using UnityEngine;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
@@ -38,6 +38,12 @@ public class PlayerController : MonoBehaviour
     static int _lastEToggleFrame = -1;  // E 토글 다중 처리 방지
     public PlayerAnimation playerAnim;
     float _lastMouseX;
+    public bool firstPerson = true;
+    public bool followHead = true;
+    public Vector3 fpOffsetLocal = new Vector3(0f, 0.05f, 0.08f);
+    public float fallbackEyeHeight = 1.6f;
+    Animator _anim;
+    Transform _headBone;
 
     /// <summary>
     /// 컴포넌트/카메라 참조 확보
@@ -53,6 +59,38 @@ public class PlayerController : MonoBehaviour
             cam = GetComponentInChildren<Camera>()?.transform;
         }
         if (playerAnim == null) playerAnim = GetComponentInChildren<PlayerAnimation>();
+        _anim = GetComponentInChildren<Animator>();
+        _headBone = null;
+        if (_anim != null && _anim.avatar != null && _anim.isHuman)
+        {
+            try
+            {
+                _headBone = _anim.GetBoneTransform(HumanBodyBones.Head);
+            }
+            catch
+            {
+                _headBone = null;
+            }
+        }
+        else
+        {
+            followHead = false;
+        }
+        if (firstPerson && cam != null)
+        {
+            if (followHead && _headBone != null)
+            {
+                cam.SetParent(_headBone, false);
+                cam.localPosition = fpOffsetLocal;
+                cam.localRotation = Quaternion.identity;
+            }
+            else
+            {
+                cam.SetParent(transform, false);
+                cam.localPosition = new Vector3(0f, fallbackEyeHeight, 0f) + fpOffsetLocal;
+                cam.localRotation = Quaternion.identity;
+            }
+        }
     }
 
     /// <summary>
@@ -222,5 +260,20 @@ public class PlayerController : MonoBehaviour
         if (cam != null)
             cam.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
         if (playerAnim != null) playerAnim.SetHeadTurn(_lastMouseX);
+    }
+
+    void LateUpdate()
+    {
+        if (!firstPerson || cam == null) return;
+        if (followHead && _headBone != null)
+        {
+            cam.localPosition = fpOffsetLocal;
+            cam.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        }
+        else
+        {
+            cam.position = transform.position + Vector3.up * fallbackEyeHeight + transform.TransformVector(fpOffsetLocal);
+            cam.rotation = Quaternion.Euler(xRotation, transform.eulerAngles.y, 0f);
+        }
     }
 }
