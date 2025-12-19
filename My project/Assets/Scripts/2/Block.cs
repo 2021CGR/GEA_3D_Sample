@@ -1,7 +1,7 @@
 using UnityEngine;
 
 // 블록 타입 정의
-public enum BlockType { Dirt, Grass, Water, Iron, Diamond, IronSword, Axe, Pickax }
+public enum BlockType { Dirt, Grass, Water, Iron, Diamond, IronSword, Axe, Pickax, Sand, Cactus, Snow, Ice, Stone, DiamondSword }
 
 /// <summary>
 /// 채광 가능한 간단한 블록 엔티티.

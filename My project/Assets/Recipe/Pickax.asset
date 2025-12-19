@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayName: Pickax
   inputs:
-  - type: 3
+  - type: 12
     count: 2
   - type: 1
     count: 1

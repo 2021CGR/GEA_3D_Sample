@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿﻿﻿﻿﻿﻿﻿﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -11,11 +11,37 @@ using System;
 /// </summary>
 public class Inventory : MonoBehaviour
 {
+    // [데이터 지속성] 씬 전환 시에도 인벤토리 유지 (플레이어용)
+    // static이므로 씬이 바뀌어도 값이 유지됨.
+    // 하지만 에디터에서 플레이 중지 후 다시 시작하면 초기화됨.
+    private static Dictionary<BlockType, int> globalItems = new Dictionary<BlockType, int>();
+    private static bool hasGlobalData = false;
+
     // 인벤토리가 변경(추가/삭제)될 때 UI 등에 알리는 이벤트
     public event Action OnInventoryChanged;
 
     // 아이템 저장소 (Key: 블록타입, Value: 개수)
     public Dictionary<BlockType, int> items = new();
+
+    void Awake()
+    {
+        // 씬 로드 시(Awake), 글로벌 데이터가 있다면 현재 인벤토리에 덮어씌움
+        if (hasGlobalData)
+        {
+            items = new Dictionary<BlockType, int>(globalItems);
+            Debug.Log($"[Inventory] 글로벌 데이터 로드 완료 (아이템 {items.Count}종)");
+        }
+    }
+
+    /// <summary>
+    /// 현재 인벤토리 상태를 글로벌 저장소에 백업
+    /// </summary>
+    public void SyncToGlobal()
+    {
+        globalItems = new Dictionary<BlockType, int>(items);
+        hasGlobalData = true;
+        Debug.Log("[Inventory] 글로벌 데이터 저장됨");
+    }
 
     /// <summary>
     /// 특정 아이템의 현재 보유 개수 조회
@@ -40,6 +66,7 @@ public class Inventory : MonoBehaviour
         items[type] += count;
         Debug.Log($"[Inventory] 획득: {type} (+{count}) | 총: {items[type]}");
 
+        SyncToGlobal(); // 변경 사항 저장
         // UI 갱신 요청 (구독자가 있다면 실행)
         OnInventoryChanged?.Invoke();
     }
@@ -59,6 +86,7 @@ public class Inventory : MonoBehaviour
         items[type] = have - count;
         Debug.Log($"[Inventory] 사용: {type} (-{count}) | 총: {items[type]}");
 
+        SyncToGlobal(); // 변경 사항 저장
         OnInventoryChanged?.Invoke();
         return true; // 성공
     }

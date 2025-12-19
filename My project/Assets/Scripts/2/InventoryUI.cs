@@ -21,9 +21,14 @@ public class InventoryUI : MonoBehaviour
     [Header("아이콘 리소스")]
     public Sprite dirtIcon;
     public Sprite grassIcon;
+    public Sprite stoneIcon;  // 신규
     public Sprite waterIcon;
     public Sprite ironIcon;
     public Sprite diamondIcon;
+    public Sprite sandIcon;   // 신규
+    public Sprite cactusIcon; // 신규
+    public Sprite snowIcon;   // 신규
+    public Sprite iceIcon;    // 신규
     public Sprite ironSwordIcon;
     public Sprite axeIcon;
     public Sprite pickaxIcon;
@@ -77,12 +82,18 @@ public class InventoryUI : MonoBehaviour
     {
         iconMap[BlockType.Dirt] = dirtIcon;
         iconMap[BlockType.Grass] = grassIcon;
+        iconMap[BlockType.Stone] = stoneIcon; // 신규
         iconMap[BlockType.Water] = waterIcon;
         iconMap[BlockType.Iron] = ironIcon;
         iconMap[BlockType.Diamond] = diamondIcon;
+        iconMap[BlockType.Sand] = sandIcon;   // 신규
+        iconMap[BlockType.Cactus] = cactusIcon; // 신규
+        iconMap[BlockType.Snow] = snowIcon;   // 신규
+        iconMap[BlockType.Ice] = iceIcon;     // 신규
         iconMap[BlockType.IronSword] = ironSwordIcon;
         iconMap[BlockType.Axe] = axeIcon;
         iconMap[BlockType.Pickax] = pickaxIcon;
+        iconMap[BlockType.DiamondSword] = diamondIcon; // 다이아 검 (임시로 다이아 아이콘 사용)
     }
 
     /// <summary>

@@ -1,46 +1,53 @@
-﻿using System.Collections.Generic;
+﻿﻿﻿﻿﻿﻿﻿﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems; // UI 위 클릭 방지용
 
-/// <summary>
-/// 채광/건축/슬롯 선택을 담당하는 통합 컨트롤러.
-/// - 카메라 중앙에서 레이캐스트하여 블록을 채광(Hit)
-/// - 선택된 블록 프리팹을 월드에 설치(건축)
-/// - 인벤토리 변경을 구독하여 슬롯 목록을 갱신하고 선택을 유지
-/// - 무기/도구(검/도끼/곡괭이)에 따라 데미지를 가변 적용
-/// </summary>
-public class PlayerHarvester : MonoBehaviour
-{
-    // [데이터 구조] 블록 타입과 프리팹을 연결
-    [System.Serializable]
-    public struct BlockMapping
+    /// <summary>
+    /// 채광/건축/슬롯 선택을 담당하는 통합 컨트롤러.
+    /// - 카메라 중앙에서 레이캐스트하여 블록 채광 또는 적 공격
+    /// - 선택된 블록 프리팹을 월드에 설치(건축)
+    /// - 인벤토리 변경을 구독하여 슬롯 목록을 갱신하고 선택을 유지
+    /// - 무기/도구(검/도끼/곡괭이)에 따라 채광/공격 데미지를 가변 적용
+    /// </summary>
+    public class PlayerHarvester : MonoBehaviour
     {
-        public BlockType type;    // 예: Dirt
-        public GameObject prefab; // 예: DirtPrefab
-    }
+        // [데이터 구조] 블록 타입과 프리팹을 연결
+        [System.Serializable]
+        public struct BlockMapping
+        {
+            public BlockType type;    // 예: Dirt
+            public GameObject prefab; // 예: DirtPrefab
+        }
 
-    #region [1. 변수 및 설정]
+        #region [1. 변수 및 설정]
 
-    [Header("UI 연결")]
-    [Tooltip("슬롯 선택 시 빨간 테두리 표시를 위한 UI 스크립트")]
-    public InventoryUI inventoryUI;
+        [Header("UI 연결")]
+        [Tooltip("슬롯 선택 시 빨간 테두리 표시를 위한 UI 스크립트")]
+        public InventoryUI inventoryUI;
 
-    [Header("채광(Mining) 설정")]
-    [Tooltip("팔이 닿는 최대 거리")]
-    public float rayDistance = 5f;
+        [Header("채광(Mining) 및 전투(Combat) 설정")]
+        [Tooltip("팔이 닿는 최대 거리")]
+        public float rayDistance = 5f;
 
-    [Tooltip("레이캐스트 충돌 레이어")]
-    public LayerMask hitMask = ~0;
+        [Tooltip("레이캐스트 충돌 레이어")]
+        public LayerMask hitMask = ~0;
 
-    [Tooltip("기본 채광 데미지 (맨손)")]
-    public int baseDamage = 1;
+        [Tooltip("기본 데미지 (맨손: 채광1, 공격1)")]
+        public int baseDamage = 1;
 
-    [Tooltip("철검(IronSword) 착용 시 데미지")]
-    public int swordDamage = 5;
-    [Tooltip("도끼(Axe) 착용 시 데미지")]
-    public int axeDamage = 3;
-    [Tooltip("곡괭이(Pickax) 착용 시 데미지")]
-    public int pickaxDamage = 4;
+        [Header("도구별 데미지 설정")]
+        [Tooltip("철검: 채광(기본), 공격(5)")]
+        public int swordAttackDamage = 5;
+        public int swordMiningDamage = 1;
+
+        [Tooltip("도끼: 채광(3), 공격(3) - 밸런스형")]
+        public int axeDamage = 3;
+
+        [Tooltip("곡괭이: 채광(4), 공격(기본)")]
+        public int pickaxMiningDamage = 4;
+        public int pickaxAttackDamage = 1;
+
+        // ... (나머지 변수 생략)
 
     [Tooltip("공격/건축 쿨다운 (광클 방지)")]
     public float hitCooldown = 0.15f;
@@ -191,9 +198,10 @@ public class PlayerHarvester : MonoBehaviour
     #region [4. 채광 및 건축 로직]
 
     /// <summary>
-    /// 채광(블록 타격) 처리:
+    /// 채광(블록 타격) 및 공격 처리:
     /// - 카메라 중앙에서 레이캐스트
-    /// - 선택된 무기/도구에 따라 데미지 계산 후 Block.Hit 호출
+    /// - 블록이면 채광 데미지 적용
+    /// - 적(Enemy)이면 공격 데미지 적용
     /// </summary>
     void TryMine()
     {
@@ -202,28 +210,51 @@ public class PlayerHarvester : MonoBehaviour
         if (Physics.Raycast(ray, out var hit, rayDistance, hitMask))
         {
             var block = hit.collider.GetComponent<Block>();
+            var enemy = hit.collider.GetComponent<VoxelEnemy>(); // 적 식별
+
+            // [블록 채광]
             if (block != null)
             {
-                // [데미지 로직] 도구/무기 선택에 따라 가변
-                int currentDamage = baseDamage;
+                int miningDamage = baseDamage;
+
                 if (currentSelectedBlock == BlockType.IronSword)
                 {
-                    currentDamage = swordDamage;
-                    Debug.Log("⚔️ 철검 공격! (데미지: " + currentDamage + ")");
+                    miningDamage = swordMiningDamage; // 기본값(1)
                 }
                 else if (currentSelectedBlock == BlockType.Axe)
                 {
-                    currentDamage = axeDamage;
-                    Debug.Log("🪓 도끼 공격! (데미지: " + currentDamage + ")");
+                    miningDamage = axeDamage; // 밸런스(3)
                 }
                 else if (currentSelectedBlock == BlockType.Pickax)
                 {
-                    currentDamage = pickaxDamage;
-                    Debug.Log("⛏️ 곡괭이 공격! (데미지: " + currentDamage + ")");
+                    miningDamage = pickaxMiningDamage; // 높음(4)
                 }
 
+                Debug.Log($"⛏️ 채광 시도: {miningDamage} 데미지");
                 if (anim != null) anim.TriggerAttack();
-                block.Hit(currentDamage, inventory);
+                block.Hit(miningDamage, inventory);
+            }
+            // [적 공격]
+            else if (enemy != null)
+            {
+                int attackDamage = baseDamage;
+
+                if (currentSelectedBlock == BlockType.IronSword)
+                {
+                    attackDamage = swordAttackDamage; // 높음(5)
+                }
+                else if (currentSelectedBlock == BlockType.Axe)
+                {
+                    attackDamage = axeDamage; // 밸런스(3)
+                }
+                else if (currentSelectedBlock == BlockType.Pickax)
+                {
+                    attackDamage = pickaxAttackDamage; // 기본값(1)
+                }
+
+                Debug.Log($"⚔️ 적 공격! {attackDamage} 데미지");
+                if (anim != null) anim.TriggerAttack();
+                enemy.TakeDamage(attackDamage);
             }
         }
     }

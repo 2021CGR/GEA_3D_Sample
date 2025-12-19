@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using UnityEngine;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
@@ -11,9 +11,16 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
+    [Header("플레이어 상태")]
+    public int maxHp = 100;
+    public int currentHp;
+
+    // ... (기존 헤더들)
     [Header("이동 설정")]
     [Tooltip("플레이어의 이동 속도입니다.")]
     public float moveSpeed = 5f;
+    [Tooltip("플레이어의 달리기 속도입니다.")]
+    public float runSpeed = 8f;
 
     [Tooltip("점프 시 적용될 힘입니다.")]
     public float jumpPower = 5f;
@@ -98,8 +105,20 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     void Start()
     {
+        currentHp = maxHp;
         // 게임 시작 시 마우스 커서를 화면 중앙에 고정하고 숨김 (FPS 모드)
         SetCursorLock(true);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHp -= damage;
+        Debug.Log($"[Player] 피격! 체력: {currentHp}/{maxHp}");
+        if (currentHp <= 0)
+        {
+            Debug.Log("[Player] 사망!");
+            // 사망 처리 로직 (게임 오버 UI 등)
+        }
     }
 
     /// <summary>
@@ -214,7 +233,8 @@ public class PlayerController : MonoBehaviour
         Vector3 move = transform.right * h + transform.forward * v;
 
         // 실제 이동 적용 (방향 * 속도 * 프레임보정)
-        controller.Move(move * moveSpeed * Time.deltaTime);
+        float currentSpeed = runKey ? runSpeed : moveSpeed;
+        controller.Move(move * currentSpeed * Time.deltaTime);
         if (playerAnim != null)
         {
             playerAnim.ApplyLocomotion(h, v, runKey);

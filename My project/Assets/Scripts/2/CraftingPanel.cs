@@ -3,6 +3,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement; // 씬 전환용
 
 /// <summary>
 /// 간단한 제작 패널 제어:
@@ -38,7 +39,49 @@ public class CraftingPanel : MonoBehaviour
         SetOpen(false);
         if (craftButton != null) craftButton.onClick.AddListener(DoCraft);
         if (clearButton != null) clearButton.onClick.AddListener(ClearPlanned);
+        
+        // [하드코딩 레시피 주입]
+        InjectHardcodedRecipes();
+
         RefreshPlannedUI();
+    }
+
+    void InjectHardcodedRecipes()
+    {
+        if (recipeList == null) recipeList = new List<CraftingRecipe>();
+
+        // 1. 곡괭이 (돌 2개 -> 곡괭이)
+        AddRecipe(new Dictionary<BlockType, int> { { BlockType.Stone, 2 } }, BlockType.Pickax, "Pickax");
+
+        // 2. 도끼 (철 2개 -> 도끼) - 사막맵용 (철이 나온다고 가정)
+        AddRecipe(new Dictionary<BlockType, int> { { BlockType.Iron, 2 } }, BlockType.Axe, "Axe");
+
+        // 3. 다이아 검 (다이아 2개 -> 다이아검) - 빙하맵용
+        AddRecipe(new Dictionary<BlockType, int> { { BlockType.Diamond, 2 } }, BlockType.DiamondSword, "DiamondSword");
+        
+        // 4. 철검 (철 2개 -> 철검) - 기본
+        AddRecipe(new Dictionary<BlockType, int> { { BlockType.Iron, 2 } }, BlockType.IronSword, "IronSword");
+    }
+
+    void AddRecipe(Dictionary<BlockType, int> inputs, BlockType output, string name)
+    {
+        // 중복 방지 (간단 체크)
+        foreach (var r in recipeList)
+        {
+            if (r.name == name) return;
+        }
+
+        var recipe = ScriptableObject.CreateInstance<CraftingRecipe>();
+        recipe.name = name;
+        recipe.displayName = name;
+        
+        foreach (var kv in inputs)
+        {
+            recipe.inputs.Add(new CraftingRecipe.Ingredient { type = kv.Key, count = kv.Value });
+        }
+        recipe.outputs.Add(new CraftingRecipe.Product { type = output, count = 1 });
+
+        recipeList.Add(recipe);
     }
 
     // 입력 처리는 PlayerController에서 전담합니다.
@@ -177,11 +220,45 @@ public class CraftingPanel : MonoBehaviour
         foreach (var prod in match.outputs)
         {
             inventory.Add(prod.type, prod.count);
+
+            // [게임 로직] 특정 아이템 제작 시 씬 전환 또는 게임 클리어
+            CheckGameProgress(prod.type);
         }
         consumedPlanned.Clear();
         planned.Clear();
         RefreshPlannedUI();
         SetHint("조합 완료");
+    }
+
+    void CheckGameProgress(BlockType craftedItem)
+    {
+        // 씬 전환 전 강제 저장
+        if (inventory != null) inventory.SyncToGlobal();
+
+        if (NosieVoxelMap.Instance == null) return;
+        var biome = NosieVoxelMap.Instance.currentBiome;
+
+        // 1. 일반(Normal) 맵에서 곡괭이(Pickax) 제작 -> 사막 맵(Map2) 이동
+        if (biome == NosieVoxelMap.MapBiome.Normal && craftedItem == BlockType.Pickax)
+        {
+            Debug.Log("🎉 곡괭이 제작 완료! 사막 맵으로 이동합니다.");
+            SceneManager.LoadScene("Map2"); // 씬 이름 확인 필요
+        }
+        // 2. 사막(Desert) 맵에서 도끼(Axe) 제작 -> 빙하 맵(Map3) 이동
+        else if (biome == NosieVoxelMap.MapBiome.Desert && craftedItem == BlockType.Axe)
+        {
+            Debug.Log("🎉 도끼 제작 완료! 빙하 맵으로 이동합니다.");
+            SceneManager.LoadScene("Map3"); // 씬 이름 확인 필요
+        }
+        // 3. 빙하(Glacier) 맵에서 다이아검(DiamondSword) 제작 -> 게임 클리어
+        else if (biome == NosieVoxelMap.MapBiome.Glacier && craftedItem == BlockType.DiamondSword)
+        {
+            Debug.Log("🏆 다이아 검 제작 완료! 게임 클리어!");
+            SetHint("게임 클리어! 축하합니다!");
+            // 게임 종료 또는 엔딩 크레딧
+            // Application.Quit(); 
+            // EditorApplication.isPlaying = false;
+        }
     }
 
     /// <summary>

@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayName: Axe
   inputs:
-  - type: 5
-    count: 1
   - type: 3
+    count: 1
+  - type: 9
     count: 2
   outputs:
   - type: 6
